@@ -1,0 +1,15 @@
+application:
+  name: market-data
+  project: market-data-nodejs-with-postgres
+  cloud_region: aws/ap-south-1
+  publicly_accessible: true
+databases:
+- type: postgresql
+  version: "11.5"
+  name: marketdata-postgresql-3498225
+routers:
+- name: main
+  routes:
+  - application_name: market-data-nodejs-with-postgres
+    paths:
+    - /*

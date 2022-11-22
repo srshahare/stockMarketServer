@@ -578,8 +578,8 @@ module.exports = {
     });
 
     // Todo uncomment and schedule handling
-    client.connect(endpoint);
     const job = schedule.scheduleJob("globalSocket", rule, () => {
+      client.connect(endpoint);
     });
   },
 };
