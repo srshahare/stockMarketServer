@@ -28,6 +28,13 @@ app.use((err, req, res, next) => {
   res.status(500).send({ message: err.message });
 });
 
+app.get("/status", (req, res, next) => {
+  res.status(200).json({
+    status: "Ok",
+    message: "Server is Running"
+  })
+})
+
 //* Creating server instance
 const server = http.createServer(app);
 socket.wsInstance(server);
