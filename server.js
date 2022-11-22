@@ -45,6 +45,6 @@ socket.wsInstance(server);
 //* Running server
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
-  console.log("database HOST, ", process.env.QOVERY_POSTGRESQL_ZEC72C406_HOST_INTERNAL);
+  console.log("database HOST, ", process.env.DB_HOST);
   console.log("Server is running on port,", PORT);
 });
