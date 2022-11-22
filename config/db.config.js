@@ -2,12 +2,12 @@ require("dotenv").config();
 const Sequelize = require("sequelize");
 
 const sequelize = new Sequelize(
-  process.env.QOVERY_POSTGRESQL_ZEC72C406_DEFAULT_DATABASE_NAME,
-  process.env.QOVERY_POSTGRESQL_ZEC72C406_LOGIN,
-  process.env.QOVERY_POSTGRESQL_ZEC72C406_PASSWORD,
+  process.env.DB_DATABASE,
+  process.env.DB_USER,
+  process.env.DB_PASSWORD,
   {
-    HOST: process.env.QOVERY_POSTGRESQL_ZEC72C406_HOST,
-    PORT: process.env.QOVERY_POSTGRESQL_ZEC72C406_PORT,
+    HOST: process.env.DB_HOST,
+    PORT: process.env.DB_PORT,
     dialect: "postgres",
     operatorsAliases: false,
     logging: false,
