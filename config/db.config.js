@@ -2,7 +2,7 @@ require("dotenv").config();
 const Sequelize = require("sequelize");
 
 let sequelize;
-if (process.env.QOVERY_APPLICATION_ZCF658DA6_ENVIRONMENT_NAME === "production") {
+if (process.env.QOVERY_APPLICATION_Z36BEDFA6_ENVIRONMENT_NAME === "production") {
   sequelize = new Sequelize(process.env.QOVERY_POSTGRESQL_ZEC72C406_DATABASE_URL)
 } else {
   sequelize = new Sequelize(
