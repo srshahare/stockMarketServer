@@ -6,7 +6,7 @@ application:
 databases:
 - type: postgresql
   version: "11.5"
-  name: marketdata-postgresql-3498225
+  name: marketdata-postgresql
 routers:
 - name: main
   routes:

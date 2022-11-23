@@ -35,6 +35,8 @@ const {
   optionTickReqListBankNifty,
   finalTickListNifty,
   finalTicklListBankNifty,
+  optionTickVolListNifty,
+  optionTickVolListBankNifty,
 } = require("../helpers/queue/dataTickQueue");
 const { saveOptionData } = require("../controllers/database/optionController");
 const { saveSnapshot } = require("../controllers/database/snapshotController");
@@ -320,8 +322,23 @@ module.exports = {
           clearInterval(minuteMsgInterval);
           clearInterval(mainInterval);
 
+          // clear all the queues
+          optionVolListNifty.splice(0, optionVolListNifty.length)
+          optionVolListBankNifty.splice(0, optionVolListBankNifty.length)
+          optionTickVolListNifty.splice(0, optionTickVolListNifty.length)
+          optionTickVolListBankNifty.splice(0, optionTickVolListBankNifty.length)
+          let elList = [15, 30, 45, 60]
+          elList.forEach(dur => {
+            finalListNifty[dur].splice(0, finalListNifty[dur].length);
+            finalListBankNifty[dur].splice(0, finalListBankNifty[dur].length);
+            finalTickListNifty[dur].splice(0, finalTickListNifty[dur].length);
+            finalTicklListBankNifty[dur].splice(0, finalTicklListBankNifty[dur].length);
+          })
+
           // close the global data feed connection
-          doClose();
+          setTimeout(() => {
+            doClose();
+          }, 5000)
         }
       }, 60000);
 
@@ -554,9 +571,6 @@ module.exports = {
 
       function doClose() {
         connection.close();
-        setTimeout(() => {
-          client.connect(endpoint);
-        }, 30000);
       }
 
       function callAPI(request) {
