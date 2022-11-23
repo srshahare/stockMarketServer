@@ -43,6 +43,9 @@ const {
   fetchLatestExpoAvgData,
 } = require("../controllers/database/expoAvgController");
 const { refactorFinalData } = require("../helpers/refactorFinalData");
+const {
+  fetchLatestVolumeData,
+} = require("../controllers/database/sumVolController");
 
 var client = new websocketClient();
 
@@ -63,6 +66,14 @@ module.exports = {
 
     wsClient.on("connection", (socket, req) => {
       socket.isAlive = true;
+      const serverData = {
+        requestType: "",
+        exchange: "",
+        duration: "",
+        subscribe: false,
+        callDone: false
+      }
+      socket.messageData = serverData;
 
       socket.on("pong", () => {
         heartbeat(socket);
@@ -75,7 +86,7 @@ module.exports = {
 
         if (callDone == false) {
           const serverData = JSON.parse(data.toString());
-          const { requestType, exchange, duration, subscribe } = serverData;
+          const { requestType, exchange, duration } = serverData;
           socket.messageData = serverData;
           try {
             if (!requestType || !exchange || !duration) {
@@ -94,7 +105,7 @@ module.exports = {
                 "60",
                 duration
               );
-              const refactoredData = await refactorFinalData(data);
+              const refactoredData = await refactorFinalData(data, "expo");
               const msgData = {
                 MessageType: "GetMinuteData",
                 Request: {
@@ -148,7 +159,7 @@ module.exports = {
                 "30",
                 duration
               );
-              const refactoredData = await refactorFinalData(data);
+              const refactoredData = await refactorFinalData(data, "expo");
               const msgData = {
                 MessageType: "GetTickData",
                 Request: {
@@ -160,40 +171,38 @@ module.exports = {
                 Result: refactoredData,
               };
               socket.send(JSON.stringify(msgData));
-
-              // itemCount =
-              //   exchange === product.NIFTY
-              //     ? finalTickListNifty[duration].length
-              //     : finalTicklListBankNifty[duration].length;
-
-              // // request controller for minute data snapshot
-              // socketInterval.tickMsgInterval = setInterval(() => {
-              //   const volList =
-              //     exchange === product.NIFTY
-              //       ? [...finalTickListNifty[duration]]
-              //       : [...finalTicklListBankNifty[duration]];
-              //   const tickFlag =
-              //     exchange === product.NIFTY
-              //       ? socketTickFlag.isExpoTickFinalData
-              //       : socketTickFlag.isExpoTickFinalDataBankNifty;
-              //   if (tickFlag) {
-              //     const item = volList.pop();
-              //     if (itemCount < volList.length && volList.length > 0) {
-              //       itemCount += 1;
-              //       const msgData = {
-              //         MessageType: "GetTickData",
-              //         Request: {
-              //           count: volList.length,
-              //           Interval: "30",
-              //           Exchange: exchange,
-              //           Duration: duration,
-              //         },
-              //         Result: item,
-              //       };
-              //       socket.send(JSON.stringify(msgData));
-              //     }
-              //   }
-              // }, 300);
+              callDone = true;
+            } else if (requestType === types.GetMinuteVolData) {
+              // send first chunk of data
+              const data = await fetchLatestVolumeData(exchange, "60");
+              const refactoredData = await refactorFinalData(data, "vol");
+              const msgData = {
+                MessageType: "GetMinuteVolData",
+                Request: {
+                  count: data.count,
+                  Interval: "60",
+                  Exchange: exchange,
+                  Duration: duration,
+                },
+                Result: refactoredData,
+              };
+              socket.send(JSON.stringify(msgData));
+              callDone = true;
+            } else if (requestType === types.GetTickVolData) {
+              // send first chunk of data
+              const data = await fetchLatestVolumeData(exchange, "30");
+              const refactoredData = await refactorFinalData(data, "vol");
+              const msgData = {
+                MessageType: "GetTickVolData",
+                Request: {
+                  count: data.count,
+                  Interval: "30",
+                  Exchange: exchange,
+                  Duration: duration,
+                },
+                Result: refactoredData,
+              };
+              socket.send(JSON.stringify(msgData));
               callDone = true;
             } else {
               socket.send(
@@ -264,11 +273,11 @@ module.exports = {
             rule.dayOfWeek = [0, new schedule.Range(1, 5)];
             rule.hour = 9;
             rule.minute = 15;
-            console.log("minute controller initiated successfull!")
+            console.log("minute controller initiated successfull!");
             minuteReqController(connection, wsClient);
+            tickReqController(connection, wsClient);
             const reqJbo = schedule.scheduleJob("reqJob", rule, () => {
-              console.log("tick controller initiated successfull!")
-              tickReqController(connection, wsClient);
+              console.log("tick controller initiated successfull!");
             });
           } else if (!AuthConnect || !initialized) {
             Authenticate();
@@ -276,45 +285,45 @@ module.exports = {
             clearInterval(tempInterval);
           }
         }, 5000); // check if user is authenticated after each 5 sec
-      }, 30000); // wait for 30 seconds
+      }, 8000); // wait for 30 seconds
 
-      // // Todo minute interval
-      // mainInterval = setInterval(() => {
-      //   // console.log(optionVolListBankNifty.length)
-      //   const currentTime = moment().unix();
-      //   const closeTime = moment()
-      //     .set("hour", 15)
-      //     .set("minute", 35)
-      //     .set("second", 00);
-      //   const closeTimestamp = closeTime.unix();
-      //   if (currentTime > closeTimestamp) {
-      //     // close the socket
+      // Todo minute interval
+      mainInterval = setInterval(() => {
+        // console.log(optionVolListBankNifty.length)
+        const currentTime = moment().unix();
+        const closeTime = moment()
+          .set("hour", 15)
+          .set("minute", 31)
+          .set("second", 00);
+        const closeTimestamp = closeTime.unix();
+        if (currentTime > closeTimestamp) {
+          // close the socket
 
-      //     // clear all the intervals
-      //     const {
-      //       niftyPipeInterval,
-      //       bankNiftyPipeInterval,
-      //       niftyTickPipeInterval,
-      //       bankNiftyTickPipeInterval,
-      //       tickInterval,
-      //       minuteInterval,
-      //       tickMsgInterval,
-      //       minuteMsgInterval
-      //     } = socketInterval;
-      //     clearInterval(niftyPipeInterval);
-      //     clearInterval(bankNiftyPipeInterval);
-      //     clearInterval(niftyTickPipeInterval);
-      //     clearInterval(bankNiftyTickPipeInterval);
-      //     clearInterval(tickInterval);
-      //     clearInterval(minuteInterval);
-      //     clearInterval(tickMsgInterval);
-      //     clearInterval(minuteMsgInterval);
-      //     clearInterval(mainInterval);
+          // clear all the intervals
+          const {
+            niftyPipeInterval,
+            bankNiftyPipeInterval,
+            niftyTickPipeInterval,
+            bankNiftyTickPipeInterval,
+            tickInterval,
+            minuteInterval,
+            tickMsgInterval,
+            minuteMsgInterval,
+          } = socketInterval;
+          clearInterval(niftyPipeInterval);
+          clearInterval(bankNiftyPipeInterval);
+          clearInterval(niftyTickPipeInterval);
+          clearInterval(bankNiftyTickPipeInterval);
+          clearInterval(tickInterval);
+          clearInterval(minuteInterval);
+          clearInterval(tickMsgInterval);
+          clearInterval(minuteMsgInterval);
+          clearInterval(mainInterval);
 
-      //     // close the global data feed connection
-      //     doClose();
-      //   }
-      // }, 60000);
+          // close the global data feed connection
+          doClose();
+        }
+      }, 60000);
 
       connection.on("error", function (error) {
         console.log("Connection Error: " + error.toString());
@@ -332,10 +341,6 @@ module.exports = {
           const data = JSON.parse(utf8Data);
           if (data.MessageType !== "Echo") {
             // ws.send(message.utf8Data);
-            // sendWSMessage(wsClient, JSON.parse(message.utf8Data))
-          }
-          if (data.MessageType === messageTypes.RequestError) {
-            sendWSMessage(wsClient, JSON.parse(message.utf8Data));
           }
 
           // storing NIFTY & BANKNIFTY 1 min snapshots
@@ -460,21 +465,13 @@ module.exports = {
                 socketTickFlag.isNewTickNiftySnapshot = true;
                 socketTickFlag.isExpoTickFinalData = false;
                 // save nifty option data to database
-                saveSnapshot(
-                  listItem,
-                  interval,
-                  product.NIFTY
-                );
+                saveSnapshot(listItem, interval, product.NIFTY);
               } else {
                 dataTickListBankNifty.push(listItem);
                 socketTickFlag.isNewTickBankNiftySnapshot = true;
                 socketTickFlag.isExpoTickFinalDataBankNifty = false;
                 // save bank nifty option data to database
-                saveSnapshot(
-                  listItem,
-                  interval,
-                  product.BANKNIFTY
-                );
+                saveSnapshot(listItem, interval, product.BANKNIFTY);
               }
             }
             // messages for history option symbol
@@ -578,8 +575,7 @@ module.exports = {
     });
 
     // Todo uncomment and schedule handling
-    const job = schedule.scheduleJob("globalSocket", rule, () => {
-      client.connect(endpoint);
-    });
+    client.connect(endpoint);
+    const job = schedule.scheduleJob("globalSocket", rule, () => {});
   },
 };

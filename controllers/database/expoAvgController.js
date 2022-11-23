@@ -38,7 +38,7 @@ module.exports = {
         const month = moment().month();
         const date = moment().date();
         const year = moment().year();
-        const beginTime = moment([year, month, date, 0, 15, 00, 00]);
+        const beginTime = moment([year, month, date, 9, 15, 00, 00]);
         const expoAvgData = await ExpoAvg.findAndCountAll({
           where: {
             [Op.and]: [

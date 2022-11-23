@@ -5,6 +5,8 @@ module.exports = {
     GET_OPTION_HISTORY: "GET_OPTION_HISTORY",
     GET_FUTURE_HISTORY: "GET_FUTURE_HISTORY",
     GetMinuteData: "GetMinuteData",
+    GetMinuteVolData: "GetMinuteVolData",
     GetTickData: "GetTickData",
+    GetTickVolData: "GetTickVolData",
     GetBothData: "GetBothData",
 }

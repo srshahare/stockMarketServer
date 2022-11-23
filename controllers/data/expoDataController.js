@@ -26,7 +26,9 @@ module.exports = {
       const listItem = generateFirstExpoAvg(
         optionVolListNifty,
         intervalDuration,
-        tradeTime
+        tradeTime,
+        product.NIFTY,
+        "60"
       );
       pushExpoItem(listItem, intervalDuration, product.NIFTY);
       socketFlag.isExpoFinalDataNifty = true
@@ -51,7 +53,9 @@ module.exports = {
         currentItem,
         previousItem,
         tradeTime,
-        intervalDuration
+        intervalDuration,
+        product.NIFTY,
+        "60"
       );
       pushExpoItem(listItem, intervalDuration, product.NIFTY);
       socketFlag.isExpoFinalDataNifty = true
@@ -73,7 +77,9 @@ module.exports = {
       const listItem = generateFirstExpoAvg(
         optionVolListBankNifty,
         intervalDuration,
-        tradeTime
+        tradeTime,
+        product.BANKNIFTY,
+        "60"
       );
       pushExpoItem(listItem, intervalDuration, product.BANKNIFTY);
       socketFlag.isExpoFinalDataBankNifty = true
@@ -98,7 +104,9 @@ module.exports = {
         currentItem,
         previousItem,
         tradeTime,
-        intervalDuration
+        intervalDuration,
+        product.BANKNIFTY,
+        "60"
       );
       pushExpoItem(listItem, intervalDuration, product.BANKNIFTY);
       socketFlag.isExpoFinalDataBankNifty = true
@@ -120,7 +128,9 @@ module.exports = {
       const listItem = generateFirstExpoAvg(
         optionTickVolListNifty,
         intervalDuration,
-        tradeTime
+        tradeTime,
+        product.NIFTY,
+        "30"
       );
       pushTickExpoItem(listItem, intervalDuration, product.NIFTY);
       socketTickFlag.isExpoTickFinalData = true
@@ -145,7 +155,9 @@ module.exports = {
         currentItem,
         previousItem,
         tradeTime,
-        intervalDuration
+        intervalDuration,
+        product.NIFTY,
+        "30"
       );
       pushTickExpoItem(listItem, intervalDuration, product.NIFTY);
       socketTickFlag.isExpoTickFinalData = true
@@ -167,7 +179,9 @@ module.exports = {
       const listItem = generateFirstExpoAvg(
         optionTickVolListBankNifty,
         intervalDuration,
-        tradeTime
+        tradeTime,
+        product.BANKNIFTY,
+        "30"
       );
       pushTickExpoItem(listItem, intervalDuration, product.BANKNIFTY);
       socketTickFlag.isExpoTickFinalDataBankNifty = true
@@ -192,7 +206,9 @@ module.exports = {
         currentItem,
         previousItem,
         tradeTime,
-        intervalDuration
+        intervalDuration,
+        product.BANKNIFTY,
+        "30"
       );
       pushTickExpoItem(listItem, intervalDuration, product.BANKNIFTY);
       socketTickFlag.isExpoTickFinalDataBankNifty = true
@@ -270,7 +286,7 @@ function generateTempTickFinalList(duration, exchange) {
   return tempFinalList;
 }
 
-function generateFirstExpoAvg(volumeList, duration, tradeTime) {
+function generateFirstExpoAvg(volumeList, duration, tradeTime, exchange, interval) {
   const firstElementColl = volumeList.slice(0, duration);
   let sumCE = 0;
   let sumPE = 0;
@@ -289,6 +305,10 @@ function generateFirstExpoAvg(volumeList, duration, tradeTime) {
   let SMPercentAvgPE = parseFloat(percentSumPE / duration);
 
   let listItem = {
+    exchange: exchange,
+    interval: interval,
+    dataType: "ExpoAverage",
+    duration: String(duration),
     [option.PUT]: {
       Volume: parseFloat(SMAvgPE).toFixed(2),
       PercentVolume: parseFloat(SMPercentAvgPE).toFixed(2),
@@ -303,7 +323,7 @@ function generateFirstExpoAvg(volumeList, duration, tradeTime) {
   return listItem;
 }
 
-function generateExpoAvg(volListItem, previousItem, tradeTime, duration) {
+function generateExpoAvg(volListItem, previousItem, tradeTime, duration, exchange, interval) {
   const { CE, PE } = volListItem;
 
   const prevAvgCE = parseFloat(previousItem.CE.Volume);
@@ -333,6 +353,10 @@ function generateExpoAvg(volListItem, previousItem, tradeTime, duration) {
   ).toFixed(2);
 
   let listItem = {
+    exchange: exchange,
+    interval: interval,
+    dataType: "ExpoAverage",
+    duration: String(duration),
     [option.CALL]: {
       Volume: expoAvgCE,
       PercentVolume: expoPerAvgCE,

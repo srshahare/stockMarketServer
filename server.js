@@ -48,7 +48,6 @@ socket.wsInstance(server);
 // const job = schedule.scheduleJob("globalSocket", rule, () => {
 //   globalDataSocketInstance(null)
 // })
-
 //* Running server
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {

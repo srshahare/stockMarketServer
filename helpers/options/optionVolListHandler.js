@@ -65,6 +65,9 @@ module.exports = {
         const {percentCE, percentPE} = calculatePercentWeight(sumVolCall, sumVolPut)
 
         const listItem = {
+          exchange: product.NIFTY,
+          interval: "60",
+          dataType: "SumVolume",
           [option.CALL]: {
             Volume: parseFloat(sumVolCall),
             PercentVolume: parseFloat(percentCE)
@@ -77,6 +80,7 @@ module.exports = {
           date: moment.unix(tradeTime).format("DD/MM/YYYY hh:mm:ss"),
         };
         optionVolListNifty.push(listItem);
+        sendWSMessage(wss, listItem)
 
         // save sum of volume to database
         saveSumVolumeData(listItem, "60", product.NIFTY);
@@ -138,6 +142,9 @@ module.exports = {
         const {percentCE, percentPE} = calculatePercentWeight(sumVolCall, sumVolPut)
 
         const listItem = {
+          exchange: product.BANKNIFTY,
+          interval: "60",
+          dataType: "SumVolume",
           [option.CALL]: {
             Volume: parseFloat(sumVolCall),
             PercentVolume: parseFloat(percentCE)
@@ -150,6 +157,7 @@ module.exports = {
           date: moment.unix(tradeTime).format("DD/MM/YYYY hh:mm:ss"),
         };
         optionVolListBankNifty.push(listItem);
+        sendWSMessage(wss, listItem)
 
         // save sum of volume to database
         saveSumVolumeData(listItem, "60", product.BANKNIFTY);
@@ -214,6 +222,9 @@ module.exports = {
         const {percentCE, percentPE} = calculatePercentWeight(sumVolCall, sumVolPut)
 
         const listItem = {
+          exchange: product.NIFTY,
+          interval: "30",
+          dataType: "SumVolume",
           [option.CALL]: {
             Volume: parseFloat(sumVolCall),
             PercentVolume: parseFloat(percentCE)
@@ -226,9 +237,11 @@ module.exports = {
           date: moment.unix(tradeTime).format("DD/MM/YYYY hh:mm:ss"),
         };
         optionTickVolListNifty.push(listItem);
-
+        
         // save sum of volume to database
         saveSumVolumeData(listItem, "30", product.NIFTY);
+        
+        sendWSMessage(wss, listItem)
 
         // delete all the option items of current tradeTime
         filteredList.forEach((item) => {
@@ -287,6 +300,9 @@ module.exports = {
         const {percentCE, percentPE} = calculatePercentWeight(sumVolCall, sumVolPut)
 
         const listItem = {
+          exchange: product.BANKNIFTY,
+          interval: "30",
+          dataType: "SumVolume",
           [option.CALL]: {
             Volume: parseFloat(sumVolCall),
             PercentVolume: parseFloat(percentCE)
@@ -299,7 +315,8 @@ module.exports = {
           date: moment.unix(tradeTime).format("DD/MM/YYYY hh:mm:ss"),
         };
         optionTickVolListBankNifty.push(listItem);
-                
+        sendWSMessage(wss, listItem)
+
         // generate exponential data for duration 15, 30, 45, 60
         generateExpoTickDataBankNifty(tradeTime, "15", wss);
         generateExpoTickDataBankNifty(tradeTime, "30", wss);
