@@ -3,7 +3,7 @@ const Sequelize = require("sequelize");
 
 let sequelize;
 if (process.env.QOVERY_APPLICATION_Z36BEDFA6_ENVIRONMENT_NAME === "production") {
-  sequelize = new Sequelize(process.env.QOVERY_POSTGRESQL_Z1A1E0E43_DATABASE_URL)
+  sequelize = new Sequelize(process.env.QOVERY_POSTGRESQL_ZE91675C1_DATABASE_URL)
 } else {
   sequelize = new Sequelize(
     process.env.DB_DATABASE,
