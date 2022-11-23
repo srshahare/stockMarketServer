@@ -73,8 +73,8 @@ module.exports = {
         exchange: "",
         duration: "",
         subscribe: false,
-        callDone: false
-      }
+        callDone: false,
+      };
       socket.messageData = serverData;
 
       socket.on("pong", () => {
@@ -287,7 +287,7 @@ module.exports = {
             clearInterval(tempInterval);
           }
         }, 5000); // check if user is authenticated after each 5 sec
-      }, 8000); // wait for 30 seconds
+      }, 30000); // wait for 30 seconds
 
       // Todo minute interval
       mainInterval = setInterval(() => {
@@ -323,22 +323,28 @@ module.exports = {
           clearInterval(mainInterval);
 
           // clear all the queues
-          optionVolListNifty.splice(0, optionVolListNifty.length)
-          optionVolListBankNifty.splice(0, optionVolListBankNifty.length)
-          optionTickVolListNifty.splice(0, optionTickVolListNifty.length)
-          optionTickVolListBankNifty.splice(0, optionTickVolListBankNifty.length)
-          let elList = [15, 30, 45, 60]
-          elList.forEach(dur => {
+          optionVolListNifty.splice(0, optionVolListNifty.length);
+          optionVolListBankNifty.splice(0, optionVolListBankNifty.length);
+          optionTickVolListNifty.splice(0, optionTickVolListNifty.length);
+          optionTickVolListBankNifty.splice(
+            0,
+            optionTickVolListBankNifty.length
+          );
+          let elList = [15, 30, 45, 60];
+          elList.forEach((dur) => {
             finalListNifty[dur].splice(0, finalListNifty[dur].length);
             finalListBankNifty[dur].splice(0, finalListBankNifty[dur].length);
             finalTickListNifty[dur].splice(0, finalTickListNifty[dur].length);
-            finalTicklListBankNifty[dur].splice(0, finalTicklListBankNifty[dur].length);
-          })
+            finalTicklListBankNifty[dur].splice(
+              0,
+              finalTicklListBankNifty[dur].length
+            );
+          });
 
           // close the global data feed connection
           setTimeout(() => {
             doClose();
-          }, 5000)
+          }, 5000);
         }
       }, 60000);
 
@@ -589,7 +595,8 @@ module.exports = {
     });
 
     // Todo uncomment and schedule handling
-    client.connect(endpoint);
-    const job = schedule.scheduleJob("globalSocket", rule, () => {});
+    const job = schedule.scheduleJob("globalSocket", rule, () => {
+      client.connect(endpoint);
+    });
   },
 };
