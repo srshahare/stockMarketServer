@@ -32,53 +32,53 @@ module.exports = {
 
     // subscribe for NIFTY
     // Todo : Uncomment for nifty snapshot data
-    // SubscribeSnapshot(conn, instrumentId1);
+    SubscribeSnapshot(conn, instrumentId1);
     // subscribe for BANKNIFTY
     // Todo : Uncomment for banknifty snapshot data
-    // SubscribeSnapshot(conn, instrumentId2);
+    SubscribeSnapshot(conn, instrumentId2);
 
-    // subscribe for NIFTY & BANKNIFTY
-    // first time call
-    setTimeout(() => {
-      GetFutureHistory(
-        conn,
-        instrumentId1,
-        fromTime,
-        fromTime,
-        "FutureHistory"
-      );
-    }, 1000);
-    setTimeout(() => {
-      GetFutureHistory(
-        conn,
-        instrumentId2,
-        fromTime,
-        fromTime,
-        "FutureHistory"
-      );
-    }, 1000);
-    // loop calls
-    socketInterval.minuteInterval = setInterval(() => {
-      fromTime = fromTime + 60;
-      setTimeout(() => {
-        GetFutureHistory(
-          conn,
-          instrumentId1,
-          fromTime,
-          fromTime,
-          "FutureHistory"
-        );
-        setTimeout(() => {
-          GetFutureHistory(
-            conn,
-            instrumentId2,
-            fromTime,
-            fromTime,
-            "FutureHistory"
-          );
-        }, 500);
-      }, 1000);
-    }, 3000); // loop each 60 sec
+    // // subscribe for NIFTY & BANKNIFTY
+    // // first time call
+    // setTimeout(() => {
+    //   GetFutureHistory(
+    //     conn,
+    //     instrumentId1,
+    //     fromTime,
+    //     fromTime,
+    //     "FutureHistory"
+    //   );
+    // }, 1000);
+    // setTimeout(() => {
+    //   GetFutureHistory(
+    //     conn,
+    //     instrumentId2,
+    //     fromTime,
+    //     fromTime,
+    //     "FutureHistory"
+    //   );
+    // }, 1000);
+    // // loop calls
+    // socketInterval.minuteInterval = setInterval(() => {
+    //   fromTime = fromTime + 60;
+    //   setTimeout(() => {
+    //     GetFutureHistory(
+    //       conn,
+    //       instrumentId1,
+    //       fromTime,
+    //       fromTime,
+    //       "FutureHistory"
+    //     );
+    //     setTimeout(() => {
+    //       GetFutureHistory(
+    //         conn,
+    //         instrumentId2,
+    //         fromTime,
+    //         fromTime,
+    //         "FutureHistory"
+    //       );
+    //     }, 500);
+    //   }, 1000);
+    // }, 3000); // loop each 60 sec
   },
 
   tickReqController: (conn, wss) => {

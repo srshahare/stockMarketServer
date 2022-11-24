@@ -45,13 +45,13 @@ module.exports = {
   globalDataSocketInstance: (wsClient) => {
     var endpoint = "ws://nimblewebstream.lisuns.com:4575/";
     var accesskey = "2cdf0c7e-aedd-4e33-897e-bfe99951fd53";
-    moment.tz.setDefault("Asia/Kolkata")
+    moment.tz.setDefault("Asia/Kolkata");
 
     const rule = new schedule.RecurrenceRule();
-    rule.tz = "Asia/Kolkata"
+    rule.tz = "Asia/Kolkata";
     rule.dayOfWeek = [0, new schedule.Range(1, 5)];
-    rule.hour = 19;
-    rule.minute = 39;
+    rule.hour = 9;
+    rule.minute = 14;
 
     client.on("connectFailed", function (error) {
       console.log(error);
@@ -245,15 +245,15 @@ module.exports = {
             initialized = true;
             console.log("controllers initiated!, ", moment().toDate());
             const rule = new schedule.RecurrenceRule();
-            rule.tz = "Asia/Kolkata"
+            rule.tz = "Asia/Kolkata";
             rule.dayOfWeek = [0, new schedule.Range(1, 5)];
-            rule.hour = 19;
-            rule.minute = 40;
+            rule.hour = 9;
+            rule.minute = 15;
             console.log("minute controller initiated successfull!");
             minuteReqController(connection, wsClient);
-            // tickReqController(connection, wsClient);
             const reqJbo = schedule.scheduleJob("reqJob", rule, () => {
               console.log("tick controller initiated successfull!");
+              tickReqController(connection, wsClient);
             });
           } else if (!AuthConnect || !initialized) {
             Authenticate();
@@ -267,12 +267,13 @@ module.exports = {
       mainInterval = setInterval(() => {
         const currentTime = moment().unix(); // 330 hours for 5:30 GMT offset
         const closeTime = moment()
-          .set("hour", 15)
-          .set("minute", 31)
+          .set("hour", 23)
+          .set("minute", 00)
           .set("second", 00);
+        // closing time is 11:00 pm of each day
         const closeTimestamp = closeTime.unix();
         // Todo make it greater than
-        if (currentTime < closeTimestamp) {
+        if (currentTime > closeTimestamp) {
           // close the socket
           console.log("Global data instance is stopping!", moment().toDate());
           // clear all the intervals
@@ -512,7 +513,6 @@ module.exports = {
       function doClose() {
         connection.close();
         console.log("Global data instance has stopped!", moment().toDate());
-
       }
 
       function callAPI(request) {
@@ -531,7 +531,8 @@ module.exports = {
     });
 
     // Todo uncomment and schedule handling
-    client.connect(endpoint);
-    const job = schedule.scheduleJob("globalSocket", rule, () => {});
+    const job = schedule.scheduleJob("globalSocket", rule, () => {
+      client.connect(endpoint);
+    });
   },
 };

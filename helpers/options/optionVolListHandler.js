@@ -77,7 +77,6 @@ module.exports = {
           date: moment.unix(tradeTime).format("DD/MM/YYYY hh:mm:ss"),
         };
         optionVolListNifty.push(listItem);
-        console.log(optionVolListNifty)
         sendWSMessage(wss, listItem)
 
         // save sum of volume to database
