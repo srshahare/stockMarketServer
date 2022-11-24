@@ -35,7 +35,9 @@ const {
 } = require("../helpers/queue/dataTickQueue");
 const { saveOptionData } = require("../controllers/database/optionController");
 const { saveSnapshot } = require("../controllers/database/snapshotController");
-const { fetchLatestExpoAvgData } = require("../controllers/database/expoAvgController");
+const {
+  fetchLatestExpoAvgData,
+} = require("../controllers/database/expoAvgController");
 
 var client = new websocketClient();
 
@@ -87,17 +89,13 @@ module.exports = {
                 })
               );
             }
-            if(requestType === 'Restart') {
-              client.connect(endpoint)
+            if (requestType === "Restart") {
+              client.connect(endpoint);
             }
-            if (requestType === types.GetMinuteData) {              
+            if (requestType === types.GetMinuteData) {
               // send first chunk of data
-              const d = await fetchLatestExpoAvgData(
-                exchange,
-                "60",
-                duration
-              );
-              console.log("db data,", d)
+              const d = await fetchLatestExpoAvgData(exchange, "60", duration);
+              console.log("db data,", d);
               // const refactoredData = await refactorFinalData(data, "expo");
               const data =
                 exchange === product.NIFTY
@@ -144,9 +142,9 @@ module.exports = {
               // const data = await fetchLatestVolumeData(exchange, "60");
               // const refactoredData = await refactorFinalData(data, "vol");
               const data =
-              exchange === product.NIFTY
-                ? optionVolListNifty
-                : optionVolListBankNifty;
+                exchange === product.NIFTY
+                  ? optionVolListNifty
+                  : optionVolListBankNifty;
               const msgData = {
                 MessageType: "GetMinuteVolData",
                 Request: {
@@ -157,7 +155,7 @@ module.exports = {
                 },
                 Result: data,
               };
-              
+
               socket.send(JSON.stringify(msgData));
               callDone = true;
             } else if (requestType === types.GetTickVolData) {
@@ -165,9 +163,9 @@ module.exports = {
               // const data = await fetchLatestVolumeData(exchange, "30");
               // const refactoredData = await refactorFinalData(data, "vol");
               const data =
-              exchange === product.NIFTY
-                ? optionTickVolListNifty
-                : optionTickVolListBankNifty;
+                exchange === product.NIFTY
+                  ? optionTickVolListNifty
+                  : optionTickVolListBankNifty;
               const msgData = {
                 MessageType: "GetTickVolData",
                 Request: {
@@ -271,9 +269,10 @@ module.exports = {
           .set("minute", 31)
           .set("second", 00);
         const closeTimestamp = closeTime.unix();
+        console.log(socketInterval.niftyPipeInterval)
         if (currentTime > closeTimestamp) {
           // close the socket
-          console.log('Global data instance is stopping!', moment().toDate())
+          console.log("Global data instance is stopping!", moment().toDate());
           // clear all the intervals
           const {
             niftyPipeInterval,
@@ -336,7 +335,7 @@ module.exports = {
           const { utf8Data } = message;
           const data = JSON.parse(utf8Data);
 
-          if(data.MessageType !== 'Echo') {
+          if (data.MessageType !== "Echo") {
             // wsClient.clients.forEach(ws => {
             //   ws.send(JSON.stringify(data))
             // })
@@ -344,9 +343,7 @@ module.exports = {
 
           // storing NIFTY & BANKNIFTY 1 min snapshots
           // Todo : check the if stmt again to generate real time snapshot
-          if (
-            data.MessageType === messageTypes.RealtimeSnapshotResult
-          ) {
+          if (data.MessageType === messageTypes.RealtimeSnapshotResult) {
             socketFlag.isNewSnapshot = true;
             // const instrumentIdNifty = generateInstrumentId("NIFTY");
             const instrumentIdNifty = "NIFTY 50";
@@ -355,18 +352,16 @@ module.exports = {
               dataListNifty.push(data);
               socketFlag.isNewNiftySnapshot = true;
               socketFlag.isExpoFinalDataNifty = false;
-              //Todo saveSnapshot(data, "60", product.NIFTY);
+              saveSnapshot(data, "60", product.NIFTY);
             } else {
               dataListBankNifty.push(data);
               socketFlag.isNewBankNiftySnapshot = true;
               socketFlag.isExpoFinalDataBankNifty = false;
-              //Todo saveSnapshot(data, "60", product.BANKNIFTY);
+              saveSnapshot(data, "60", product.BANKNIFTY);
             }
           }
           // messages when get history for option symols for 1 min data
-          else if (
-            data.MessageType === messageTypes.HistoryOHLCResult
-          ) {
+          else if (data.MessageType === messageTypes.HistoryOHLCResult) {
             // check if string contains BANKNIFTY if yes then store in bankniftylist
             const { Request, Result } = data;
             const userTag = String(Request.UserTag);
@@ -388,18 +383,18 @@ module.exports = {
                 dataListNifty.push(item);
                 socketFlag.isNewNiftySnapshot = true;
                 socketFlag.isExpoFinalDataNifty = false;
-                wsClient.clients.forEach(ws => {
-                  ws.send(JSON.stringify(data))
-                })
-                 saveSnapshot(item, interval, product.NIFTY);
+                wsClient.clients.forEach((ws) => {
+                  ws.send(JSON.stringify(data));
+                });
+                saveSnapshot(item, interval, product.NIFTY);
               } else {
                 dataListBankNifty.push(item);
                 socketFlag.isNewBankNiftySnapshot = true;
                 socketFlag.isExpoFinalDataBankNifty = false;
-                wsClient.clients.forEach(ws => {
-                  ws.send(JSON.stringify(data))
-                })
-                 saveSnapshot(item, interval, product.BANKNIFTY);
+                wsClient.clients.forEach((ws) => {
+                  ws.send(JSON.stringify(data));
+                });
+                saveSnapshot(item, interval, product.BANKNIFTY);
               }
             } else {
               if (Result.length > 0) {
@@ -422,21 +417,21 @@ module.exports = {
                 if (productTag === product.NIFTY) {
                   optionReqListNifty.push(listItem);
                   // save nifty option data to database
-                  //todo saveOptionData(
-                  //   listItem,
-                  //   interval,
-                  //   product.NIFTY,
-                  //   Request.InstrumentIdentifier
-                  // );
+                  saveOptionData(
+                    listItem,
+                    interval,
+                    product.NIFTY,
+                    Request.InstrumentIdentifier
+                  );
                 } else {
                   optionReqListBankNifty.push(listItem);
                   // save banknifty option data to database
-                  //todo saveOptionData(
-                  //   listItem,
-                  //   interval,
-                  //   product.BANKNIFTY,
-                  //   Request.InstrumentIdentifier
-                  // );
+                  saveOptionData(
+                    listItem,
+                    interval,
+                    product.BANKNIFTY,
+                    Request.InstrumentIdentifier
+                  );
                 }
               }
             }
@@ -468,13 +463,13 @@ module.exports = {
                 socketTickFlag.isNewTickNiftySnapshot = true;
                 socketTickFlag.isExpoTickFinalData = false;
                 // save nifty option data to database
-                //todo saveSnapshot(listItem, interval, product.NIFTY);
+                saveSnapshot(listItem, interval, product.NIFTY);
               } else {
                 dataTickListBankNifty.push(listItem);
                 socketTickFlag.isNewTickBankNiftySnapshot = true;
                 socketTickFlag.isExpoTickFinalDataBankNifty = false;
                 // save bank nifty option data to database
-                //todo saveSnapshot(listItem, interval, product.BANKNIFTY);
+                saveSnapshot(listItem, interval, product.BANKNIFTY);
               }
             }
             // messages for history option symbol
@@ -503,27 +498,26 @@ module.exports = {
                 };
                 if (productTag === product.NIFTY) {
                   optionTickReqListNifty.push(listItem);
-                  //todo saveOptionData(
-                  //   listItem,
-                  //   interval,
-                  //   product.NIFTY,
-                  //   Request.InstrumentIdentifier
-                  // );
+                  saveOptionData(
+                    listItem,
+                    interval,
+                    product.NIFTY,
+                    Request.InstrumentIdentifier
+                  );
                 } else {
                   optionTickReqListBankNifty.push(listItem);
-                  //todo saveOptionData(
-                  //   listItem,
-                  //   interval,
-                  //   product.BANKNIFTY,
-                  //   Request.InstrumentIdentifier
-                  // );
+                  saveOptionData(
+                    listItem,
+                    interval,
+                    product.BANKNIFTY,
+                    Request.InstrumentIdentifier
+                  );
                 }
               }
             }
           }
         }
       });
-
 
       function doClose() {
         connection.close();
@@ -546,7 +540,6 @@ module.exports = {
 
     // Todo uncomment and schedule handling
     client.connect(endpoint);
-    const job = schedule.scheduleJob("globalSocket", rule, () => {
-    });
+    const job = schedule.scheduleJob("globalSocket", rule, () => {});
   },
 };
