@@ -10,6 +10,7 @@ const {
   generateSumOfTickVolOptionListNifty,
   generateSumOfTickVolOptionListBankNifty,
 } = require("../../helpers/options/optionVolListHandler");
+const dataQueue = require("../../helpers/queue/dataQueue");
 const {
   dataListNifty,
   dataListBankNifty,
@@ -32,6 +33,9 @@ module.exports = {
         //*: stop the interval when the market is closed
         socketInterval.niftyPipeInterval = setInterval(async () => {
           // new data has arrived and queue of NIFTY is not empty
+          console.log(socketFlag.isNewNiftySnapshot)
+          console.log(dataListNifty)
+          console.log("from obj ", dataQueue.dataListNifty)
           if (socketFlag.isNewNiftySnapshot && dataListNifty.length !== 0) {
             socketFlag.isNewNiftySnapshot = false;
             // no need to wait for that function (instant execution)

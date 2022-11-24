@@ -246,8 +246,8 @@ module.exports = {
             const rule = new schedule.RecurrenceRule();
             rule.tz = "Asia/Kolkata"
             rule.dayOfWeek = [0, new schedule.Range(1, 5)];
-            rule.hour = 18;
-            rule.minute = 00;
+            rule.hour = 9;
+            rule.minute = 15;
             console.log("minute controller initiated successfull!");
             minuteReqController(connection, wsClient);
             tickReqController(connection, wsClient);
@@ -270,7 +270,8 @@ module.exports = {
           .set("minute", 31)
           .set("second", 00);
         const closeTimestamp = closeTime.unix();
-        if (currentTime > closeTimestamp) {
+        // Todo make it greater than
+        if (currentTime < closeTimestamp) {
           // close the socket
           console.log("Global data instance is stopping!", moment().utcOffset(330).toDate());
           // clear all the intervals
