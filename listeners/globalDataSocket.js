@@ -263,6 +263,7 @@ module.exports = {
 
       // Todo minute interval
       mainInterval = setInterval(() => {
+        console.log("interval working!")
         // console.log(optionVolListBankNifty.length)
         const currentTime = moment().unix();
         const closeTime = moment()
@@ -272,7 +273,7 @@ module.exports = {
         const closeTimestamp = closeTime.unix();
         if (currentTime > closeTimestamp) {
           // close the socket
-
+          console.log('server exit', moment().toDate())
           // clear all the intervals
           const {
             niftyPipeInterval,
