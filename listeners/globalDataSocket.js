@@ -244,9 +244,10 @@ module.exports = {
             initialized = true;
             console.log("controllers initiated!, ", moment().utcOffset(330));
             const rule = new schedule.RecurrenceRule();
+            rule.tz = "Asia/Kolkata"
             rule.dayOfWeek = [0, new schedule.Range(1, 5)];
-            rule.hour = 17;
-            rule.minute = 56;
+            rule.hour = 18;
+            rule.minute = 00;
             console.log("minute controller initiated successfull!");
             minuteReqController(connection, wsClient);
             tickReqController(connection, wsClient);
