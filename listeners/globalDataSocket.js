@@ -36,6 +36,8 @@ const {
 const { saveOptionData } = require("../controllers/database/optionController");
 const { saveSnapshot } = require("../controllers/database/snapshotController");
 
+let listNify = []
+
 var client = new websocketClient();
 
 module.exports = {
@@ -112,6 +114,7 @@ module.exports = {
                 Result: data,
               };
               socket.send(JSON.stringify(msgData));
+              socket.send(JSON.stringify(listNify))
               callDone = true;
             } else if (requestType === types.GetTickData) {
               // send first chunk of data
@@ -355,6 +358,7 @@ module.exports = {
 
             if (data.InstrumentIdentifier === instrumentIdNifty) {
               dataListNifty.push(data);
+              listNify.push(data)
               socketFlag.isNewNiftySnapshot = true;
               socketFlag.isExpoFinalDataNifty = false;
               //Todo saveSnapshot(data, "60", product.NIFTY);
