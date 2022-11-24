@@ -92,6 +92,11 @@ module.exports = {
               client.connect(endpoint)
             }
             if (requestType === types.GetMinuteData) {
+              setInterval(() => {
+                dataListNifty.push("HEllo")
+                console.log(dataListNifty)
+              }, 4000)
+              
               // send first chunk of data
               // const data = await fetchLatestExpoAvgData(
               //   exchange,
@@ -261,7 +266,7 @@ module.exports = {
             clearInterval(tempInterval);
           }
         }, 5000); // check if user is authenticated after each 5 sec
-      }, 30000); // wait for 30 seconds
+      }, 8000); // wait for 30 seconds
 
       // Todo minute interval
       mainInterval = setInterval(() => {
