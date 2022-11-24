@@ -76,8 +76,6 @@ module.exports = {
           tradeTime,
           date: moment.unix(tradeTime).format("DD/MM/YYYY hh:mm:ss"),
         };
-        console.log("list item", listItem)
-        console.log(optionTickVolListNifty)
         optionVolListNifty.push(listItem);
         sendWSMessage(wss, listItem)
 

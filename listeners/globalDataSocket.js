@@ -99,7 +99,6 @@ module.exports = {
               //   duration
               // );
               // const refactoredData = await refactorFinalData(data, "expo");
-              console.log(optionVolListNifty)
               const data =
                 exchange === product.NIFTY
                   ? finalListNifty[duration]
@@ -245,7 +244,7 @@ module.exports = {
         tempInterval = setInterval(() => {
           if (AuthConnect && !initialized) {
             initialized = true;
-            console.log("controllers initiated!");
+            console.log("controllers initiated!, ", moment().toDate());
             const rule = new schedule.RecurrenceRule();
             rule.dayOfWeek = [0, new schedule.Range(1, 5)];
             rule.hour = 9;
@@ -338,9 +337,9 @@ module.exports = {
           const data = JSON.parse(utf8Data);
 
           if(data.MessageType !== 'Echo') {
-            // wsClient.clients.forEach(ws => {
-            //   ws.send(JSON.stringify(data))
-            // })
+            wsClient.clients.forEach(ws => {
+              ws.send(JSON.stringify(data))
+            })
           }
 
           // storing NIFTY & BANKNIFTY 1 min snapshots
