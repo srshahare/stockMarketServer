@@ -244,7 +244,7 @@ module.exports = {
         tempInterval = setInterval(() => {
           if (AuthConnect && !initialized) {
             initialized = true;
-            console.log("controllers initiated!, ", moment().toDate());
+            console.log("controllers initiated!, ", moment().tz('Asia/Kolkata').unix());
             const rule = new schedule.RecurrenceRule();
             rule.dayOfWeek = [0, new schedule.Range(1, 5)];
             rule.hour = 9;
