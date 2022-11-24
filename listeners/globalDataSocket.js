@@ -99,6 +99,7 @@ module.exports = {
               //   duration
               // );
               // const refactoredData = await refactorFinalData(data, "expo");
+              console.log(finalListNifty[15])
               const data =
                 exchange === product.NIFTY
                   ? finalListNifty[duration]
@@ -114,7 +115,6 @@ module.exports = {
                 Result: data,
               };
               socket.send(JSON.stringify(msgData));
-              socket.send(JSON.stringify(listNify))
               callDone = true;
             } else if (requestType === types.GetTickData) {
               // send first chunk of data
@@ -358,7 +358,6 @@ module.exports = {
 
             if (data.InstrumentIdentifier === instrumentIdNifty) {
               dataListNifty.push(data);
-              listNify.push(data)
               socketFlag.isNewNiftySnapshot = true;
               socketFlag.isExpoFinalDataNifty = false;
               //Todo saveSnapshot(data, "60", product.NIFTY);
