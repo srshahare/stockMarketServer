@@ -242,7 +242,7 @@ module.exports = {
         tempInterval = setInterval(() => {
           if (AuthConnect && !initialized) {
             initialized = true;
-            console.log("controllers initiated!, ", moment().unix());
+            console.log("controllers initiated!, ", moment().utcOffset("+05:30").unix());
             const rule = new schedule.RecurrenceRule();
             rule.dayOfWeek = [0, new schedule.Range(1, 5)];
             rule.hour = 9;
@@ -263,16 +263,15 @@ module.exports = {
 
       // Todo minute interval
       mainInterval = setInterval(() => {
-        const currentTime = moment().unix();
+        const currentTime = moment().utcOffset("+05:30").unix();
         const closeTime = moment()
           .set("hour", 15)
           .set("minute", 31)
           .set("second", 00);
         const closeTimestamp = closeTime.unix();
-        console.log(socketInterval.niftyPipeInterval)
         if (currentTime > closeTimestamp) {
           // close the socket
-          console.log("Global data instance is stopping!", moment().toDate());
+          console.log("Global data instance is stopping!", moment().utcOffset("+05:30").toDate());
           // clear all the intervals
           const {
             niftyPipeInterval,
