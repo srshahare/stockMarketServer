@@ -270,7 +270,7 @@ module.exports = {
           .set("minute", 31)
           .set("second", 00);
         const closeTimestamp = closeTime.unix();
-        if (currentTime > closeTimestamp) {
+        if (currentTime < closeTimestamp) {
           // close the socket
           console.log("Global data instance is stopping!", moment().utcOffset("+05:30").toDate());
           // clear all the intervals
