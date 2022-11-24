@@ -242,11 +242,11 @@ module.exports = {
         tempInterval = setInterval(() => {
           if (AuthConnect && !initialized) {
             initialized = true;
-            console.log("controllers initiated!, ", moment().utcOffset(330).unix());
+            console.log("controllers initiated!, ", moment().utcOffset(330));
             const rule = new schedule.RecurrenceRule();
             rule.dayOfWeek = [0, new schedule.Range(1, 5)];
-            rule.hour = 9;
-            rule.minute = 15;
+            rule.hour = 17;
+            rule.minute = 56;
             console.log("minute controller initiated successfull!");
             minuteReqController(connection, wsClient);
             tickReqController(connection, wsClient);
