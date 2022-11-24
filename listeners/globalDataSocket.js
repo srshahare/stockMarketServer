@@ -266,14 +266,14 @@ module.exports = {
       mainInterval = setInterval(() => {
         const currentTime = moment().utcOffset(330).toDate(); // 330 hours for 5:30 GMT offset
         console.log(currentTime)
-        const closeTime = moment()
+        const closeTime = moment().utcOffset(330)
           .set("hour", 15)
           .set("minute", 31)
           .set("second", 00);
         const closeTimestamp = closeTime.unix();
-        if (currentTime < closeTimestamp) {
+        if (currentTime > closeTimestamp) {
           // close the socket
-          console.log("Global data instance is stopping!", moment().utcOffset("+05:30").toDate());
+          console.log("Global data instance is stopping!", moment().utcOffset(330).toDate());
           // clear all the intervals
           const {
             niftyPipeInterval,
