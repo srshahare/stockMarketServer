@@ -36,8 +36,6 @@ const {
 const { saveOptionData } = require("../controllers/database/optionController");
 const { saveSnapshot } = require("../controllers/database/snapshotController");
 
-let listNify = []
-
 var client = new websocketClient();
 
 module.exports = {
@@ -93,11 +91,12 @@ module.exports = {
             }
             if (requestType === types.GetMinuteData) {              
               // send first chunk of data
-              // const data = await fetchLatestExpoAvgData(
-              //   exchange,
-              //   "60",
-              //   duration
-              // );
+              const d = await fetchLatestExpoAvgData(
+                exchange,
+                "60",
+                duration
+              );
+              console.log(d)
               // const refactoredData = await refactorFinalData(data, "expo");
               const data =
                 exchange === product.NIFTY
@@ -391,7 +390,7 @@ module.exports = {
                 wsClient.clients.forEach(ws => {
                   ws.send(JSON.stringify(data))
                 })
-                //Todo saveSnapshot(item, interval, product.NIFTY);
+                 saveSnapshot(item, interval, product.NIFTY);
               } else {
                 dataListBankNifty.push(item);
                 socketFlag.isNewBankNiftySnapshot = true;
@@ -399,7 +398,7 @@ module.exports = {
                 wsClient.clients.forEach(ws => {
                   ws.send(JSON.stringify(data))
                 })
-                //todo saveSnapshot(item, interval, product.BANKNIFTY);
+                 saveSnapshot(item, interval, product.BANKNIFTY);
               }
             } else {
               if (Result.length > 0) {

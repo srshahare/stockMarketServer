@@ -4,7 +4,7 @@ const cors = require("cors");
 const http = require("http");
 
 //Todo Importing database
-// const db = require("./models");
+const db = require("./models");
 
 //* Importing socket
 const socket = require("./socket");
@@ -18,9 +18,9 @@ app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 
 //Todo Database Configuration
-// db.sequelize.sync({ force: true }).then(() => {
-//   console.log("DB Synced!");
-// });
+db.sequelize.sync({ force: true }).then(() => {
+  console.log("DB Synced!");
+});
 
 app.use((err, req, res, next) => {
   res.status(500).send({ message: err.message });

@@ -4,6 +4,7 @@ const moment = require("moment");
 const product = require("../../constants/product");
 
 const ExpoAvg = db.expoAvg;
+const Snapshot = db.snapshot
 
 module.exports = {
   saveExpoAvgData: async (
@@ -55,6 +56,8 @@ module.exports = {
           order: [["timeStamp", "DESC"]],
           limit: 800,
         });
+        const snaps = await Snapshot.findAll()
+        resolve(snaps)
         if(expoAvgData) {
             resolve(expoAvgData)
         }else {
