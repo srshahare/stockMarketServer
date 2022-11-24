@@ -99,7 +99,7 @@ module.exports = {
               //   duration
               // );
               // const refactoredData = await refactorFinalData(data, "expo");
-              console.log(finalListNifty[15])
+              console.log(optionVolListNifty)
               const data =
                 exchange === product.NIFTY
                   ? finalListNifty[duration]
@@ -266,9 +266,6 @@ module.exports = {
 
       // Todo minute interval
       mainInterval = setInterval(() => {
-        console.log("interval working!")
-        console.log("snapshot list", dataListNifty)
-        // console.log(optionVolListBankNifty.length)
         const currentTime = moment().unix();
         const closeTime = moment()
           .set("hour", 15)
@@ -277,7 +274,7 @@ module.exports = {
         const closeTimestamp = closeTime.unix();
         if (currentTime > closeTimestamp) {
           // close the socket
-          console.log('server exit', moment().toDate())
+          console.log('Global data instance is stopping!', moment().toDate())
           // clear all the intervals
           const {
             niftyPipeInterval,
