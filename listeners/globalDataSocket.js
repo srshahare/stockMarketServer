@@ -336,9 +336,9 @@ module.exports = {
           const data = JSON.parse(utf8Data);
 
           if(data.MessageType !== 'Echo') {
-            wsClient.clients.forEach(ws => {
-              ws.send(JSON.stringify(data))
-            })
+            // wsClient.clients.forEach(ws => {
+            //   ws.send(JSON.stringify(data))
+            // })
           }
 
           // storing NIFTY & BANKNIFTY 1 min snapshots
