@@ -57,9 +57,9 @@ module.exports = {
         "FutureHistory"
       );
     }, 1000);
-    fromTime = fromTime + 60;
     // loop calls
     socketInterval.minuteInterval = setInterval(() => {
+      fromTime = fromTime + 60;
       setTimeout(() => {
         GetFutureHistory(
           conn,
@@ -78,7 +78,6 @@ module.exports = {
           );
         }, 500);
       }, 1000);
-      fromTime = fromTime + 60;
     }, 60000); // loop each 60 sec
   },
 
@@ -114,9 +113,9 @@ module.exports = {
         "FutureHistory"
       );
     }, 1000);
-    fromTime = fromTime + 30;
     // loop calls
     socketInterval.tickInterval = setInterval(() => {
+      fromTime = fromTime + 30;
       setTimeout(() => {
         GetFutureTickHistory(
           conn,
@@ -135,7 +134,6 @@ module.exports = {
           );
         }, 500);
       }, 1000);
-      fromTime = fromTime + 30;
     }, 30000); // loop each 30 sec
   },
 };
