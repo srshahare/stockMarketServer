@@ -78,7 +78,7 @@ module.exports = {
           );
         }, 500);
       }, 1000);
-    }, 60000); // loop each 60 sec
+    }, 6000); // loop each 60 sec
   },
 
   tickReqController: (conn, wss) => {
@@ -134,6 +134,6 @@ module.exports = {
           );
         }, 500);
       }, 1000);
-    }, 30000); // loop each 30 sec
+    }, 3000); // loop each 30 sec
   },
 };
