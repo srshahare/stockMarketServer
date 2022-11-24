@@ -242,7 +242,7 @@ module.exports = {
         tempInterval = setInterval(() => {
           if (AuthConnect && !initialized) {
             initialized = true;
-            console.log("controllers initiated!, ", parseInt(moment().utcOffset(330).unix()));
+            console.log("controllers initiated!, ", moment().utcOffset(330).unix());
             const rule = new schedule.RecurrenceRule();
             rule.dayOfWeek = [0, new schedule.Range(1, 5)];
             rule.hour = 9;
@@ -263,7 +263,7 @@ module.exports = {
 
       // Todo minute interval
       mainInterval = setInterval(() => {
-        const currentTime = parseInt(moment().utcOffset(330).toDate()); // 330 hours for 5:30 GMT offset
+        const currentTime = moment().utcOffset(330).toDate(); // 330 hours for 5:30 GMT offset
         const closeTime = moment()
           .set("hour", 15)
           .set("minute", 31)
