@@ -45,6 +45,7 @@ module.exports = {
   globalDataSocketInstance: (wsClient) => {
     var endpoint = "ws://nimblewebstream.lisuns.com:4575/";
     var accesskey = "2cdf0c7e-aedd-4e33-897e-bfe99951fd53";
+    moment.tz.setDefault("Asia/Kolkata")
 
     const rule = new schedule.RecurrenceRule();
     rule.dayOfWeek = [0, new schedule.Range(1, 5)];
