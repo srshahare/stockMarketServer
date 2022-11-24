@@ -264,6 +264,7 @@ module.exports = {
       // Todo minute interval
       mainInterval = setInterval(() => {
         console.log("interval working!")
+        console.log("snapshot list", dataListNifty)
         // console.log(optionVolListBankNifty.length)
         const currentTime = moment().unix();
         const closeTime = moment()
