@@ -9,9 +9,6 @@ const {
   generateExpoTickDataBankNifty,
 } = require("../../controllers/data/expoDataController");
 const {
-  saveSumVolumeData,
-} = require("../../controllers/database/sumVolController");
-const {
   optionVolListNifty,
   optionVolListBankNifty,
   optionReqListNifty,
@@ -83,7 +80,7 @@ module.exports = {
         sendWSMessage(wss, listItem)
 
         // save sum of volume to database
-        saveSumVolumeData(listItem, "60", product.NIFTY);
+        //todo saveSumVolumeData(listItem, "60", product.NIFTY);
 
         // delete all the option items of current tradeTime
         filteredList.forEach((item) => {
@@ -160,7 +157,7 @@ module.exports = {
         sendWSMessage(wss, listItem)
 
         // save sum of volume to database
-        saveSumVolumeData(listItem, "60", product.BANKNIFTY);
+        //todo saveSumVolumeData(listItem, "60", product.BANKNIFTY);
 
         // delete all the option items of current tradeTime
         filteredList.forEach((item) => {
@@ -239,7 +236,7 @@ module.exports = {
         optionTickVolListNifty.push(listItem);
         
         // save sum of volume to database
-        saveSumVolumeData(listItem, "30", product.NIFTY);
+        //todo saveSumVolumeData(listItem, "30", product.NIFTY);
         
         sendWSMessage(wss, listItem)
 
@@ -324,7 +321,7 @@ module.exports = {
         generateExpoTickDataBankNifty(tradeTime, "60", wss);
 
         // save sum of volume to database
-        saveSumVolumeData(listItem, "30", product.BANKNIFTY);
+        //todo saveSumVolumeData(listItem, "30", product.BANKNIFTY);
 
         // delete all the option items of current tradeTime
         filteredList.forEach((item) => {

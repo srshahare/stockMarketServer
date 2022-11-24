@@ -22,12 +22,7 @@ const {
   finalListNifty,
   finalListBankNifty,
 } = require("../helpers/queue/dataQueue");
-const {
-  generateInstrumentId,
-} = require("../helpers/instrument/instrumentHandler");
 const product = require("../constants/product");
-const { requestHandler } = require("../helpers/requestHandler");
-const { generateFeed } = require("../helpers/generateRealTimeFeed");
 const {
   dataTickListNifty,
   dataTickListBankNifty,
@@ -40,14 +35,6 @@ const {
 } = require("../helpers/queue/dataTickQueue");
 const { saveOptionData } = require("../controllers/database/optionController");
 const { saveSnapshot } = require("../controllers/database/snapshotController");
-const { sendWSMessage } = require("../helpers/sendMessage");
-const {
-  fetchLatestExpoAvgData,
-} = require("../controllers/database/expoAvgController");
-const { refactorFinalData } = require("../helpers/refactorFinalData");
-const {
-  fetchLatestVolumeData,
-} = require("../controllers/database/sumVolController");
 
 var client = new websocketClient();
 
@@ -84,7 +71,6 @@ module.exports = {
       // listener for this server messages
       socket.on("message", async function incoming(data) {
         var callDone = false;
-        var itemCount = 0;
 
         if (callDone == false) {
           const serverData = JSON.parse(data.toString());
@@ -102,107 +88,90 @@ module.exports = {
             }
             if (requestType === types.GetMinuteData) {
               // send first chunk of data
-              const data = await fetchLatestExpoAvgData(
-                exchange,
-                "60",
-                duration
-              );
-              const refactoredData = await refactorFinalData(data, "expo");
+              // const data = await fetchLatestExpoAvgData(
+              //   exchange,
+              //   "60",
+              //   duration
+              // );
+              // const refactoredData = await refactorFinalData(data, "expo");
+              const data =
+                exchange === product.NIFTY
+                  ? finalListNifty[duration]
+                  : finalListBankNifty[duration];
               const msgData = {
                 MessageType: "GetMinuteData",
                 Request: {
-                  count: data.count,
+                  count: data.length,
                   Interval: "60",
                   Exchange: exchange,
                   Duration: duration,
                 },
-                Result: refactoredData,
+                Result: data,
               };
               socket.send(JSON.stringify(msgData));
-
-              // itemCount =
-              //   exchange === product.NIFTY
-              //     ? finalListNifty[duration].length
-              //     : finalListBankNifty[duration].length;
-              // // request controller for minute data snapshot
-              // // Todo: Only to interpret as a real time data when market is closed
-              // socketInterval.minuteMsgInterval = setInterval(() => {
-              //   const volList =
-              //     exchange === product.NIFTY
-              //       ? [...finalListNifty[duration]]
-              //       : [...finalListBankNifty[duration]];
-              //   const minuteFlag =
-              //     exchange === product.NIFTY
-              //       ? socketFlag.isExpoFinalDataNifty
-              //       : socketFlag.isExpoFinalDataBankNifty;
-              //   if (minuteFlag) {
-              //     const item = volList.pop();
-              //     if (itemCount < volList.length && volList.length > 0) {
-              //       itemCount += 1;
-              //       const msgData = {
-              //         MessageType: "GetMinuteData",
-              //         Request: {
-              //           count: volList.length,
-              //           Interval: "60",
-              //           Exchange: exchange,
-              //           Duration: duration,
-              //         },
-              //         Result: item,
-              //       };
-              //       socket.send(JSON.stringify(msgData));
-              //     }
-              //   }
-              // }, 300);
               callDone = true;
             } else if (requestType === types.GetTickData) {
               // send first chunk of data
-              const data = await fetchLatestExpoAvgData(
-                exchange,
-                "30",
-                duration
-              );
-              const refactoredData = await refactorFinalData(data, "expo");
+              // const data = await fetchLatestExpoAvgData(
+              //   exchange,
+              //   "30",
+              //   duration
+              // );
+              // const refactoredData = await refactorFinalData(data, "expo");
+              const data =
+                exchange === product.NIFTY
+                  ? finalTickListNifty[duration]
+                  : finalTicklListBankNifty[duration];
               const msgData = {
                 MessageType: "GetTickData",
                 Request: {
-                  count: data.count,
+                  count: data.length,
                   Interval: "30",
                   Exchange: exchange,
                   Duration: duration,
                 },
-                Result: refactoredData,
+                Result: data,
               };
               socket.send(JSON.stringify(msgData));
               callDone = true;
             } else if (requestType === types.GetMinuteVolData) {
               // send first chunk of data
-              const data = await fetchLatestVolumeData(exchange, "60");
-              const refactoredData = await refactorFinalData(data, "vol");
+              // const data = await fetchLatestVolumeData(exchange, "60");
+              // const refactoredData = await refactorFinalData(data, "vol");
+              const data =
+              exchange === product.NIFTY
+                ? optionVolListNifty
+                : optionVolListBankNifty;
               const msgData = {
                 MessageType: "GetMinuteVolData",
                 Request: {
-                  count: data.count,
+                  count: data.length,
                   Interval: "60",
                   Exchange: exchange,
                   Duration: duration,
                 },
-                Result: refactoredData,
+                Result: data,
               };
+              
               socket.send(JSON.stringify(msgData));
               callDone = true;
             } else if (requestType === types.GetTickVolData) {
               // send first chunk of data
-              const data = await fetchLatestVolumeData(exchange, "30");
-              const refactoredData = await refactorFinalData(data, "vol");
+              // const data = await fetchLatestVolumeData(exchange, "30");
+              // const refactoredData = await refactorFinalData(data, "vol");
+              const data =
+              exchange === product.NIFTY
+                ? optionTickVolListNifty
+                : optionTickVolListBankNifty;
               const msgData = {
                 MessageType: "GetTickVolData",
                 Request: {
-                  count: data.count,
+                  count: data.length,
                   Interval: "30",
                   Exchange: exchange,
                   Duration: duration,
                 },
-                Result: refactoredData,
+                Result: data,
               };
               socket.send(JSON.stringify(msgData));
               callDone = true;
@@ -277,9 +246,9 @@ module.exports = {
             rule.minute = 15;
             console.log("minute controller initiated successfull!");
             minuteReqController(connection, wsClient);
+            tickReqController(connection, wsClient);
             const reqJbo = schedule.scheduleJob("reqJob", rule, () => {
               console.log("tick controller initiated successfull!");
-              tickReqController(connection, wsClient);
             });
           } else if (!AuthConnect || !initialized) {
             Authenticate();
@@ -360,11 +329,8 @@ module.exports = {
         if (message.type === "utf8") {
           AuthConnect = true;
           // get instruments for next thrusday expiry
-          const { type, utf8Data } = message;
+          const { utf8Data } = message;
           const data = JSON.parse(utf8Data);
-          if (data.MessageType !== "Echo") {
-            // ws.send(message.utf8Data);
-          }
 
           // storing NIFTY & BANKNIFTY 1 min snapshots
           // Todo : check the if stmt again to generate real time snapshot
@@ -380,12 +346,12 @@ module.exports = {
               dataListNifty.push(data);
               socketFlag.isNewNiftySnapshot = true;
               socketFlag.isExpoFinalDataNifty = false;
-              saveSnapshot(data, "60", product.NIFTY);
+              //Todo saveSnapshot(data, "60", product.NIFTY);
             } else {
               dataListBankNifty.push(data);
               socketFlag.isNewBankNiftySnapshot = true;
               socketFlag.isExpoFinalDataBankNifty = false;
-              saveSnapshot(data, "60", product.BANKNIFTY);
+              //Todo saveSnapshot(data, "60", product.BANKNIFTY);
             }
           }
           // messages when get history for option symols for 1 min data
@@ -414,12 +380,12 @@ module.exports = {
                 dataListNifty.push(item);
                 socketFlag.isNewNiftySnapshot = true;
                 socketFlag.isExpoFinalDataNifty = false;
-                saveSnapshot(item, interval, product.NIFTY);
+                //Todo saveSnapshot(item, interval, product.NIFTY);
               } else {
                 dataListBankNifty.push(item);
                 socketFlag.isNewBankNiftySnapshot = true;
                 socketFlag.isExpoFinalDataBankNifty = false;
-                saveSnapshot(item, interval, product.BANKNIFTY);
+                //todo saveSnapshot(item, interval, product.BANKNIFTY);
               }
             } else {
               if (Result.length > 0) {
@@ -442,21 +408,21 @@ module.exports = {
                 if (productTag === product.NIFTY) {
                   optionReqListNifty.push(listItem);
                   // save nifty option data to database
-                  saveOptionData(
-                    listItem,
-                    interval,
-                    product.NIFTY,
-                    Request.InstrumentIdentifier
-                  );
+                  //todo saveOptionData(
+                  //   listItem,
+                  //   interval,
+                  //   product.NIFTY,
+                  //   Request.InstrumentIdentifier
+                  // );
                 } else {
                   optionReqListBankNifty.push(listItem);
                   // save banknifty option data to database
-                  saveOptionData(
-                    listItem,
-                    interval,
-                    product.BANKNIFTY,
-                    Request.InstrumentIdentifier
-                  );
+                  //todo saveOptionData(
+                  //   listItem,
+                  //   interval,
+                  //   product.BANKNIFTY,
+                  //   Request.InstrumentIdentifier
+                  // );
                 }
               }
             }
@@ -488,13 +454,13 @@ module.exports = {
                 socketTickFlag.isNewTickNiftySnapshot = true;
                 socketTickFlag.isExpoTickFinalData = false;
                 // save nifty option data to database
-                saveSnapshot(listItem, interval, product.NIFTY);
+                //todo saveSnapshot(listItem, interval, product.NIFTY);
               } else {
                 dataTickListBankNifty.push(listItem);
                 socketTickFlag.isNewTickBankNiftySnapshot = true;
                 socketTickFlag.isExpoTickFinalDataBankNifty = false;
                 // save bank nifty option data to database
-                saveSnapshot(listItem, interval, product.BANKNIFTY);
+                //todo saveSnapshot(listItem, interval, product.BANKNIFTY);
               }
             }
             // messages for history option symbol
@@ -523,20 +489,20 @@ module.exports = {
                 };
                 if (productTag === product.NIFTY) {
                   optionTickReqListNifty.push(listItem);
-                  saveOptionData(
-                    listItem,
-                    interval,
-                    product.NIFTY,
-                    Request.InstrumentIdentifier
-                  );
+                  //todo saveOptionData(
+                  //   listItem,
+                  //   interval,
+                  //   product.NIFTY,
+                  //   Request.InstrumentIdentifier
+                  // );
                 } else {
                   optionTickReqListBankNifty.push(listItem);
-                  saveOptionData(
-                    listItem,
-                    interval,
-                    product.BANKNIFTY,
-                    Request.InstrumentIdentifier
-                  );
+                  //todo saveOptionData(
+                  //   listItem,
+                  //   interval,
+                  //   product.BANKNIFTY,
+                  //   Request.InstrumentIdentifier
+                  // );
                 }
               }
             }
@@ -544,36 +510,6 @@ module.exports = {
         }
       });
 
-      // // listener for this server messages
-      // ws.on("message", async function incoming(data) {
-      //   if (callDone == false) {
-      //     const serverData = JSON.parse(data.toString());
-      //     const { requestType } = serverData;
-      //     if (requestType === types.GetMinuteData) {
-      //       // request controller for minute data snapshot
-      //       // Todo: Only to interpret as a real time data when market is closed
-      //       generateFeed(ws);
-      //       //* at 9:15 this controller will be executed
-      //       minuteReqController(connection, ws);
-      //       callDone = true;
-      //     } else if (requestType === types.GetTickData) {
-      //       tickReqController(connection, ws);
-      //       callDone = true;
-      //     } else if (requestType === types.GetBothData) {
-      //       generateFeed(ws);
-      //       minuteReqController(connection, ws);
-      //       tickReqController(connection, ws);
-      //     } else {
-      //       // Todo : only for development
-      //       // requestHandler(
-      //       //   connection,
-      //       //   ws,
-      //       //   { MessageType: "InstrumentsResult" },
-      //       //   null
-      //       // );
-      //     }
-      //   }
-      // });
 
       function doClose() {
         connection.close();
@@ -595,8 +531,8 @@ module.exports = {
     });
 
     // Todo uncomment and schedule handling
+    client.connect(endpoint);
     const job = schedule.scheduleJob("globalSocket", rule, () => {
-      client.connect(endpoint);
     });
   },
 };
