@@ -97,7 +97,7 @@ module.exports = {
                 "60",
                 duration
               );
-              console.log(d)
+              console.log("db data,", d)
               // const refactoredData = await refactorFinalData(data, "expo");
               const data =
                 exchange === product.NIFTY
