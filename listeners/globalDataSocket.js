@@ -264,8 +264,8 @@ module.exports = {
 
       // Todo minute interval
       mainInterval = setInterval(() => {
-        const currentTime = moment().utcOffset(330).toDate(); // 330 hours for 5:30 GMT offset
-        const closeTime = moment().utcOffset(330)
+        const currentTime = moment().utcOffset(330).unix(); // 330 hours for 5:30 GMT offset
+        const closeTime = moment()
           .set("hour", 15)
           .set("minute", 31)
           .set("second", 00);
