@@ -50,8 +50,8 @@ module.exports = {
     const rule = new schedule.RecurrenceRule();
     rule.tz = "Asia/Kolkata"
     rule.dayOfWeek = [0, new schedule.Range(1, 5)];
-    rule.hour = 9;
-    rule.minute = 14;
+    rule.hour = 19;
+    rule.minute = 39;
 
     client.on("connectFailed", function (error) {
       console.log(error);
@@ -96,8 +96,7 @@ module.exports = {
             }
             if (requestType === types.GetMinuteData) {
               // send first chunk of data
-              const d = await fetchLatestExpoAvgData(exchange, "60", duration);
-              console.log("db data,", d);
+              // const d = await fetchLatestExpoAvgData(exchange, "60", duration);
               // const refactoredData = await refactorFinalData(data, "expo");
               const data =
                 exchange === product.NIFTY
@@ -248,8 +247,8 @@ module.exports = {
             const rule = new schedule.RecurrenceRule();
             rule.tz = "Asia/Kolkata"
             rule.dayOfWeek = [0, new schedule.Range(1, 5)];
-            rule.hour = 9;
-            rule.minute = 15;
+            rule.hour = 19;
+            rule.minute = 40;
             console.log("minute controller initiated successfull!");
             minuteReqController(connection, wsClient);
             tickReqController(connection, wsClient);
@@ -262,7 +261,7 @@ module.exports = {
             clearInterval(tempInterval);
           }
         }, 5000); // check if user is authenticated after each 5 sec
-      }, 8000); // wait for 30 seconds
+      }, 30000); // wait for 30 seconds
 
       // Todo minute interval
       mainInterval = setInterval(() => {
