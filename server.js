@@ -35,6 +35,8 @@ app.get("/status", (req, res, next) => {
   })
 })
 
+
+
 //* Creating server instance
 const server = http.createServer(app);
 socket.wsInstance(server);
@@ -51,6 +53,6 @@ socket.wsInstance(server);
 //* Running server
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
-  console.log("database HOST, ", process.env.DB_HOST);
+  console.log("database HOST, ", process.env.QOVERY_POSTGRESQL_ZE91675C1_DATABASE_URL);
   console.log("Server is running on port,", PORT);
 });
