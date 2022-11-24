@@ -91,12 +91,7 @@ module.exports = {
             if(requestType === 'Restart') {
               client.connect(endpoint)
             }
-            if (requestType === types.GetMinuteData) {
-              setInterval(() => {
-                dataListNifty.push("HEllo")
-                console.log(dataListNifty)
-              }, 4000)
-              
+            if (requestType === types.GetMinuteData) {              
               // send first chunk of data
               // const data = await fetchLatestExpoAvgData(
               //   exchange,
@@ -342,16 +337,15 @@ module.exports = {
           const data = JSON.parse(utf8Data);
 
           if(data.MessageType !== 'Echo') {
-            wsClient.clients.forEach(ws => {
-              ws.send(JSON.stringify(data))
-            })
+            // wsClient.clients.forEach(ws => {
+            //   ws.send(JSON.stringify(data))
+            // })
           }
 
           // storing NIFTY & BANKNIFTY 1 min snapshots
           // Todo : check the if stmt again to generate real time snapshot
           if (
-            data.MessageType === messageTypes.RealtimeSnapshotResult &&
-            data.MessageType !== messageTypes.RequestError
+            data.MessageType === messageTypes.RealtimeSnapshotResult
           ) {
             socketFlag.isNewSnapshot = true;
             // const instrumentIdNifty = generateInstrumentId("NIFTY");
@@ -371,8 +365,7 @@ module.exports = {
           }
           // messages when get history for option symols for 1 min data
           else if (
-            data.MessageType === messageTypes.HistoryOHLCResult &&
-            data.MessageType !== messageTypes.RequestError
+            data.MessageType === messageTypes.HistoryOHLCResult
           ) {
             // check if string contains BANKNIFTY if yes then store in bankniftylist
             const { Request, Result } = data;
@@ -395,11 +388,17 @@ module.exports = {
                 dataListNifty.push(item);
                 socketFlag.isNewNiftySnapshot = true;
                 socketFlag.isExpoFinalDataNifty = false;
+                wsClient.clients.forEach(ws => {
+                  ws.send(JSON.stringify(data))
+                })
                 //Todo saveSnapshot(item, interval, product.NIFTY);
               } else {
                 dataListBankNifty.push(item);
                 socketFlag.isNewBankNiftySnapshot = true;
                 socketFlag.isExpoFinalDataBankNifty = false;
+                wsClient.clients.forEach(ws => {
+                  ws.send(JSON.stringify(data))
+                })
                 //todo saveSnapshot(item, interval, product.BANKNIFTY);
               }
             } else {
