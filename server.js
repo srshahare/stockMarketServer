@@ -34,10 +34,9 @@ app.get("/status", (req, res, next) => {
 })
 
 
-
 //* Creating server instance
 const server = http.createServer(app);
-socket.wsInstance(server);
+socket.wsInstance(server, app);
 
 
 //* Running server

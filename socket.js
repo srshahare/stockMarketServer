@@ -4,7 +4,7 @@ require("dotenv").config();
 
 let wss;
 module.exports = {
-  wsInstance: (server) => {
+  wsInstance: (server, app) => {
     wss = new Server({ server });
 
     globalDataSocketInstance(wss);

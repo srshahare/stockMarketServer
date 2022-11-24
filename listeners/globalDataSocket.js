@@ -86,6 +86,9 @@ module.exports = {
                 })
               );
             }
+            if(requestType === 'Restart') {
+              client.connect(endpoint)
+            }
             if (requestType === types.GetMinuteData) {
               // send first chunk of data
               // const data = await fetchLatestExpoAvgData(
