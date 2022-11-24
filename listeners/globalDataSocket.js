@@ -35,6 +35,7 @@ const {
 } = require("../helpers/queue/dataTickQueue");
 const { saveOptionData } = require("../controllers/database/optionController");
 const { saveSnapshot } = require("../controllers/database/snapshotController");
+const { fetchLatestExpoAvgData } = require("../controllers/database/expoAvgController");
 
 var client = new websocketClient();
 
