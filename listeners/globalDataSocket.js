@@ -48,6 +48,7 @@ module.exports = {
     moment.tz.setDefault("Asia/Kolkata")
 
     const rule = new schedule.RecurrenceRule();
+    rule.tz = "Asia/Kolkata"
     rule.dayOfWeek = [0, new schedule.Range(1, 5)];
     rule.hour = 9;
     rule.minute = 14;
@@ -243,7 +244,7 @@ module.exports = {
         tempInterval = setInterval(() => {
           if (AuthConnect && !initialized) {
             initialized = true;
-            console.log("controllers initiated!, ", moment().utcOffset(330));
+            console.log("controllers initiated!, ", moment().toDate());
             const rule = new schedule.RecurrenceRule();
             rule.tz = "Asia/Kolkata"
             rule.dayOfWeek = [0, new schedule.Range(1, 5)];
@@ -265,7 +266,7 @@ module.exports = {
 
       // Todo minute interval
       mainInterval = setInterval(() => {
-        const currentTime = moment().utcOffset(330).unix(); // 330 hours for 5:30 GMT offset
+        const currentTime = moment().unix(); // 330 hours for 5:30 GMT offset
         const closeTime = moment()
           .set("hour", 15)
           .set("minute", 31)
@@ -274,7 +275,7 @@ module.exports = {
         // Todo make it greater than
         if (currentTime < closeTimestamp) {
           // close the socket
-          console.log("Global data instance is stopping!", moment().utcOffset(330).toDate());
+          console.log("Global data instance is stopping!", moment().toDate());
           // clear all the intervals
           const {
             niftyPipeInterval,
@@ -337,12 +338,6 @@ module.exports = {
           const { utf8Data } = message;
           const data = JSON.parse(utf8Data);
 
-          if (data.MessageType !== "Echo") {
-            // wsClient.clients.forEach(ws => {
-            //   ws.send(JSON.stringify(data))
-            // })
-          }
-
           // storing NIFTY & BANKNIFTY 1 min snapshots
           // Todo : check the if stmt again to generate real time snapshot
           if (data.MessageType === messageTypes.RealtimeSnapshotResult) {
@@ -354,12 +349,12 @@ module.exports = {
               dataListNifty.push(data);
               socketFlag.isNewNiftySnapshot = true;
               socketFlag.isExpoFinalDataNifty = false;
-              saveSnapshot(data, "60", product.NIFTY);
+              // saveSnapshot(data, "60", product.NIFTY);
             } else {
               dataListBankNifty.push(data);
               socketFlag.isNewBankNiftySnapshot = true;
               socketFlag.isExpoFinalDataBankNifty = false;
-              saveSnapshot(data, "60", product.BANKNIFTY);
+              // saveSnapshot(data, "60", product.BANKNIFTY);
             }
           }
           // messages when get history for option symols for 1 min data
@@ -385,18 +380,12 @@ module.exports = {
                 dataListNifty.push(item);
                 socketFlag.isNewNiftySnapshot = true;
                 socketFlag.isExpoFinalDataNifty = false;
-                wsClient.clients.forEach((ws) => {
-                  ws.send(JSON.stringify(data));
-                });
-                saveSnapshot(item, interval, product.NIFTY);
+                // saveSnapshot(item, interval, product.NIFTY);
               } else {
                 dataListBankNifty.push(item);
                 socketFlag.isNewBankNiftySnapshot = true;
                 socketFlag.isExpoFinalDataBankNifty = false;
-                wsClient.clients.forEach((ws) => {
-                  ws.send(JSON.stringify(data));
-                });
-                saveSnapshot(item, interval, product.BANKNIFTY);
+                // saveSnapshot(item, interval, product.BANKNIFTY);
               }
             } else {
               if (Result.length > 0) {
@@ -419,21 +408,21 @@ module.exports = {
                 if (productTag === product.NIFTY) {
                   optionReqListNifty.push(listItem);
                   // save nifty option data to database
-                  saveOptionData(
-                    listItem,
-                    interval,
-                    product.NIFTY,
-                    Request.InstrumentIdentifier
-                  );
+                  // saveOptionData(
+                  //   listItem,
+                  //   interval,
+                  //   product.NIFTY,
+                  //   Request.InstrumentIdentifier
+                  // );
                 } else {
                   optionReqListBankNifty.push(listItem);
                   // save banknifty option data to database
-                  saveOptionData(
-                    listItem,
-                    interval,
-                    product.BANKNIFTY,
-                    Request.InstrumentIdentifier
-                  );
+                  // saveOptionData(
+                  //   listItem,
+                  //   interval,
+                  //   product.BANKNIFTY,
+                  //   Request.InstrumentIdentifier
+                  // );
                 }
               }
             }
@@ -465,13 +454,13 @@ module.exports = {
                 socketTickFlag.isNewTickNiftySnapshot = true;
                 socketTickFlag.isExpoTickFinalData = false;
                 // save nifty option data to database
-                saveSnapshot(listItem, interval, product.NIFTY);
+                // saveSnapshot(listItem, interval, product.NIFTY);
               } else {
                 dataTickListBankNifty.push(listItem);
                 socketTickFlag.isNewTickBankNiftySnapshot = true;
                 socketTickFlag.isExpoTickFinalDataBankNifty = false;
                 // save bank nifty option data to database
-                saveSnapshot(listItem, interval, product.BANKNIFTY);
+                // saveSnapshot(listItem, interval, product.BANKNIFTY);
               }
             }
             // messages for history option symbol
@@ -500,20 +489,20 @@ module.exports = {
                 };
                 if (productTag === product.NIFTY) {
                   optionTickReqListNifty.push(listItem);
-                  saveOptionData(
-                    listItem,
-                    interval,
-                    product.NIFTY,
-                    Request.InstrumentIdentifier
-                  );
+                  // saveOptionData(
+                  //   listItem,
+                  //   interval,
+                  //   product.NIFTY,
+                  //   Request.InstrumentIdentifier
+                  // );
                 } else {
                   optionTickReqListBankNifty.push(listItem);
-                  saveOptionData(
-                    listItem,
-                    interval,
-                    product.BANKNIFTY,
-                    Request.InstrumentIdentifier
-                  );
+                  // saveOptionData(
+                  //   listItem,
+                  //   interval,
+                  //   product.BANKNIFTY,
+                  //   Request.InstrumentIdentifier
+                  // );
                 }
               }
             }
@@ -523,7 +512,7 @@ module.exports = {
 
       function doClose() {
         connection.close();
-        console.log("Global data instance has stopped!", moment().utcOffset(330).toDate());
+        console.log("Global data instance has stopped!", moment().toDate());
 
       }
 
