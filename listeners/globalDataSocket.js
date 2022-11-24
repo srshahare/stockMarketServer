@@ -251,7 +251,7 @@ module.exports = {
             rule.minute = 40;
             console.log("minute controller initiated successfull!");
             minuteReqController(connection, wsClient);
-            tickReqController(connection, wsClient);
+            // tickReqController(connection, wsClient);
             const reqJbo = schedule.scheduleJob("reqJob", rule, () => {
               console.log("tick controller initiated successfull!");
             });
