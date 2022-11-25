@@ -13,7 +13,11 @@ const {
   generateTickPipeline,
 } = require("../data/pipelineController");
 const product = require("../../constants/product");
-const { socketTickFlag, socketInterval } = require("../../constants/socketFlag");
+const {
+  socketTickFlag,
+  socketInterval,
+  socketFlag,
+} = require("../../constants/socketFlag");
 
 module.exports = {
   minuteReqController: (conn, wss) => {
@@ -30,12 +34,20 @@ module.exports = {
     generatePipeline(conn, wss, product.NIFTY);
     generatePipeline(conn, wss, product.BANKNIFTY);
 
-    // subscribe for NIFTY
-    // Todo : Uncomment for nifty snapshot data
-    SubscribeSnapshot(conn, instrumentId1);
-    // subscribe for BANKNIFTY
-    // Todo : Uncomment for banknifty snapshot data
-    SubscribeSnapshot(conn, instrumentId2);
+    setTimeout(() => {
+      let checkInterval = setInterval(() => {
+        if (!socketFlag.isSyncing) {
+          console.log("subscribing to snapshots!")
+          // subscribe for NIFTY
+          // Todo : Uncomment for nifty snapshot data
+          SubscribeSnapshot(conn, instrumentId1);
+          // subscribe for BANKNIFTY
+          // Todo : Uncomment for banknifty snapshot data
+          SubscribeSnapshot(conn, instrumentId2);
+          clearInterval(checkInterval)
+        }
+      }, 1000);
+    }, 10000);
 
     // // subscribe for NIFTY & BANKNIFTY
     // // first time call

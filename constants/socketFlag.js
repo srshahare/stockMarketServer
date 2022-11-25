@@ -9,7 +9,9 @@ module.exports = {
     isOptionSumBankNiftyDone: false,
 
     isExpoFinalDataNifty: false,
-    isExpoFinalDataBankNifty: false
+    isExpoFinalDataBankNifty: false,
+
+    isSyncing: false
   },
   socketTickFlag: {
     isNewTickSnapshot: false,
@@ -38,6 +40,8 @@ module.exports = {
     minuteInterval: null,
 
     tickMsgInterval: null,
-    minuteMsgInterval: null
+    minuteMsgInterval: null,
+
+    syncInterval: null,
   },
 };

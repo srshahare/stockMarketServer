@@ -38,6 +38,7 @@ const { saveSnapshot } = require("../controllers/database/snapshotController");
 const {
   fetchLatestExpoAvgData,
 } = require("../controllers/database/expoAvgController");
+const { syncControllers } = require("../controllers/request/syncControllers");
 
 var client = new websocketClient();
 
@@ -46,6 +47,7 @@ module.exports = {
     var endpoint = "ws://nimblewebstream.lisuns.com:4575/";
     var accesskey = "2cdf0c7e-aedd-4e33-897e-bfe99951fd53";
     moment.tz.setDefault("Asia/Kolkata");
+    let conn;
 
     const rule = new schedule.RecurrenceRule();
     rule.tz = "Asia/Kolkata";
@@ -79,7 +81,7 @@ module.exports = {
 
         if (callDone == false) {
           const serverData = JSON.parse(data.toString());
-          const { requestType, exchange, duration } = serverData;
+          const { requestType, exchange, duration, subscribe } = serverData;
           socket.messageData = serverData;
           try {
             if (!requestType || !exchange || !duration) {
@@ -91,8 +93,9 @@ module.exports = {
                 })
               );
             }
-            if (requestType === "Restart") {
-              client.connect(endpoint);
+            if (requestType === "Sync") {
+              console.log("Server syncing the data points!");
+              syncControllers(conn, subscribe);
             }
             if (requestType === types.GetMinuteData) {
               // send first chunk of data
@@ -230,6 +233,7 @@ module.exports = {
 
     client.on("connect", function (connection) {
       console.log("connection established");
+      conn = connection;
       var AuthConnect = false;
       var callDone = false;
       var initialized = false;
@@ -261,7 +265,7 @@ module.exports = {
             clearInterval(tempInterval);
           }
         }, 5000); // check if user is authenticated after each 5 sec
-      }, 30000); // wait for 30 seconds
+      }, 10000); // wait for 30 seconds
 
       // Todo minute interval
       mainInterval = setInterval(() => {
@@ -372,17 +376,26 @@ module.exports = {
               if (Result.length > 0) {
                 item = Result[0];
               }
+              if(Result.length === 0) {
+                clearInterval(socketInterval.syncInterval);
+                socketFlag.isSyncing = false;
+                console.log("Syncing has stopped!, ", moment().toDate());
+              }
               socketFlag.isNewSnapshot = true;
               let interval = "60";
               // const instrumentIdNifty = generateInstrumentId("NIFTY");
               const instrumentIdNifty = "NIFTY 50";
               if (Request.InstrumentIdentifier === instrumentIdNifty) {
-                dataListNifty.push(item);
+                if (Result.length > 0) {
+                  dataListNifty.push(item);
+                }
                 socketFlag.isNewNiftySnapshot = true;
                 socketFlag.isExpoFinalDataNifty = false;
                 // saveSnapshot(item, interval, product.NIFTY);
               } else {
-                dataListBankNifty.push(item);
+                if(Result.length > 0) {
+                  dataListBankNifty.push(item);
+                }
                 socketFlag.isNewBankNiftySnapshot = true;
                 socketFlag.isExpoFinalDataBankNifty = false;
                 // saveSnapshot(item, interval, product.BANKNIFTY);
@@ -532,6 +545,7 @@ module.exports = {
 
     // Todo uncomment and schedule handling
     const job = schedule.scheduleJob("globalSocket", rule, () => {
+      console.log("Global data instance initiated!, ", moment().toDate())
       client.connect(endpoint);
     });
   },
