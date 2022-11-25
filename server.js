@@ -2,6 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const http = require("http");
+const https = require("https")
 
 //Todo Importing database
 const db = require("./models");
@@ -35,7 +36,7 @@ app.get("/status", (req, res, next) => {
 
 
 //* Creating server instance
-const server = http.createServer(app);
+const server = https.createServer(app);
 socket.wsInstance(server, app);
 
 
