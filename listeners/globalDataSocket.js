@@ -93,6 +93,9 @@ module.exports = {
                 })
               );
             }
+            if(requestType === "Connect") {
+              client.connect(endpoint)
+            }
             if (requestType === "Sync") {
               console.log("Server syncing the data points!");
               syncControllers(conn, subscribe);

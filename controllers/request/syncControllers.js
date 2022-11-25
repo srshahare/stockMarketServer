@@ -25,7 +25,7 @@ module.exports = {
           fromTime,
           "FutureHistory"
         );
-      }, 1000);
+      }, 100);
       setTimeout(() => {
         GetFutureHistory(
           conn,
@@ -34,7 +34,7 @@ module.exports = {
           fromTime,
           "FutureHistory"
         );
-      }, 1000);
+      }, 100);
       // loop calls
       socketInterval.syncInterval = setInterval(() => {
         fromTime = fromTime + 60;
@@ -54,9 +54,9 @@ module.exports = {
               fromTime,
               "FutureHistory"
             );
-          }, 500);
-        }, 1000);
-      }, 3000); // loop each 60 sec
+          }, 100);
+        }, 200);
+      }, 20000); // loop each 60 sec
     } else {
       clearInterval(socketInterval.syncInterval);
       socketFlag.isSyncing = false;

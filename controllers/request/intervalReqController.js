@@ -18,6 +18,7 @@ const {
   socketInterval,
   socketFlag,
 } = require("../../constants/socketFlag");
+const { syncControllers } = require("./syncControllers");
 
 module.exports = {
   minuteReqController: (conn, wss) => {
@@ -35,16 +36,20 @@ module.exports = {
     generatePipeline(conn, wss, product.BANKNIFTY);
 
     setTimeout(() => {
+      syncControllers(conn, true);
+    }, 5000);
+
+    setTimeout(() => {
       let checkInterval = setInterval(() => {
         if (!socketFlag.isSyncing) {
-          console.log("subscribing to snapshots!")
+          console.log("subscribing to snapshots!");
           // subscribe for NIFTY
           // Todo : Uncomment for nifty snapshot data
           SubscribeSnapshot(conn, instrumentId1);
           // subscribe for BANKNIFTY
           // Todo : Uncomment for banknifty snapshot data
           SubscribeSnapshot(conn, instrumentId2);
-          clearInterval(checkInterval)
+          clearInterval(checkInterval);
         }
       }, 1000);
     }, 10000);
