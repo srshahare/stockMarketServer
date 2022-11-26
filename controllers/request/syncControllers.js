@@ -15,7 +15,7 @@ module.exports = {
       const month = moment().month();
       const date = moment().date();
       const year = moment().year();
-      let fromTime = moment([year, month, date, 9, 15, 00, 00]).unix();
+      let fromTime = moment([year, month, 25, 9, 15, 00, 00]).unix();
 
       setTimeout(() => {
         GetFutureHistory(

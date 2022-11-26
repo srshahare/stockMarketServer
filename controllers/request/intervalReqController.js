@@ -36,6 +36,7 @@ module.exports = {
     generatePipeline(conn, wss, product.BANKNIFTY);
 
     setTimeout(() => {
+      console.log("Data syncing initiated!")
       syncControllers(conn, true);
     }, 5000);
 

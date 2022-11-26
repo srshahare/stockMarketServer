@@ -39,6 +39,7 @@ const {
   fetchLatestExpoAvgData,
 } = require("../controllers/database/expoAvgController");
 const { syncControllers } = require("../controllers/request/syncControllers");
+const { sendWSMessage } = require("../helpers/sendMessage");
 
 var client = new websocketClient();
 
@@ -256,10 +257,14 @@ module.exports = {
             rule.dayOfWeek = [0, new schedule.Range(1, 5)];
             rule.hour = 9;
             rule.minute = 15;
-            console.log("minute controller initiated successfull!");
+            let msg1 = "minute controller initiated successfull!"
+            console.log(msg1);
+            sendWSMessage(wsClient, msg1)
             minuteReqController(connection, wsClient);
             const reqJbo = schedule.scheduleJob("reqJob", rule, () => {
-              console.log("tick controller initiated successfull!");
+              const msg2 ="tick controller initiated successfull!";
+              console.log(msg2);
+              sendWSMessage(wsClient, msg2)
               tickReqController(connection, wsClient);
             });
           } else if (!AuthConnect || !initialized) {
@@ -282,7 +287,9 @@ module.exports = {
         // Todo make it greater than
         if (currentTime > closeTimestamp) {
           // close the socket
-          console.log("Global data instance is stopping!", moment().toDate());
+          const msg3 = "Global data instance is stopping!";
+          console.log(msg3, moment().toDate());
+          sendWSMessage(wsClient, msg3)
           // clear all the intervals
           const {
             niftyPipeInterval,
@@ -528,7 +535,9 @@ module.exports = {
 
       function doClose() {
         connection.close();
-        console.log("Global data instance has stopped!", moment().toDate());
+        const msg4 = "Global data instance has stopped!"
+        console.log(msg4, moment().toDate());
+        sendWSMessage(wsClient, msg4)
       }
 
       function callAPI(request) {
@@ -548,7 +557,9 @@ module.exports = {
 
     // Todo uncomment and schedule handling
     const job = schedule.scheduleJob("globalSocket", rule, () => {
-      console.log("Global data instance initiated!, ", moment().toDate())
+      const msg5 = "Global data instance initiated!, ";
+      console.log(msg5, moment().toDate())
+      sendWSMessage(wsClient, msg5)
       client.connect(endpoint);
     });
   },

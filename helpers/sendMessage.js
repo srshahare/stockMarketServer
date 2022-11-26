@@ -1,3 +1,4 @@
+const moment = require("moment")
 const product = require("../constants/product");
 const types = require("../constants/types");
 const {
@@ -16,19 +17,50 @@ const {
 module.exports = {
   sendWSMessage: (wss, data) => {
     wss.clients.forEach((ws) => {
-      const { subscribe, duration, requestType, exchange } = ws?.messageData;
-
-      if (ws.isAlive === true && subscribe === true) {
-        let msgData = "";
-        if (exchange === product.NIFTY && data.exchange === product.NIFTY) {
-          switch (requestType) {
-            case types.GetMinuteData:
-              if (data.interval === "60" && data.dataType === "ExpoAverage") {
-                if (data.duration === duration) {
+      if (ws.isAlive === true) {
+        const { subscribe, duration, requestType, exchange } = ws?.messageData;
+        if (subscribe === true) {
+          let msgData = "";
+          if (exchange === product.NIFTY && data.exchange === product.NIFTY) {
+            switch (requestType) {
+              case types.GetMinuteData:
+                if (data.interval === "60" && data.dataType === "ExpoAverage") {
+                  if (data.duration === duration) {
+                    msgData = {
+                      MessageType: "GetMinuteData",
+                      Request: {
+                        count: finalListNifty[duration].length,
+                        Interval: "60",
+                        Exchange: exchange,
+                        Duration: duration,
+                      },
+                      Result: data,
+                    };
+                  }
+                }
+                break;
+              case types.GetTickData:
+                if (data.interval === "30" && data.dataType === "ExpoAverage") {
+                  if (data.duration === duration) {
+                    msgData = {
+                      MessageType: "GetTickData",
+                      Request: {
+                        count: finalTickListNifty[duration].length,
+                        Interval: "30",
+                        Exchange: exchange,
+                        Duration: duration,
+                      },
+                      Result: data,
+                    };
+                  }
+                }
+                break;
+              case types.GetMinuteVolData:
+                if (data.interval === "60" && data.dataType === "SumVolume") {
                   msgData = {
-                    MessageType: "GetMinuteData",
+                    MessageType: "GetMinuteVolData",
                     Request: {
-                      count: finalListNifty[duration].length,
+                      count: optionVolListNifty.length,
                       Interval: "60",
                       Exchange: exchange,
                       Duration: duration,
@@ -36,15 +68,13 @@ module.exports = {
                     Result: data,
                   };
                 }
-              }
-              break;
-            case types.GetTickData:
-              if (data.interval === "30" && data.dataType === "ExpoAverage") {
-                if (data.duration === duration) {
+                break;
+              case types.GetTickVolData:
+                if (data.interval === "30" && data.dataType === "SumVolume") {
                   msgData = {
-                    MessageType: "GetTickData",
+                    MessageType: "GetTickVolData",
                     Request: {
-                      count: finalTickListNifty[duration].length,
+                      count: optionTickVolListNifty.length,
                       Interval: "30",
                       Exchange: exchange,
                       Duration: duration,
@@ -52,73 +82,59 @@ module.exports = {
                     Result: data,
                   };
                 }
-              }
-              break;
-            case types.GetMinuteVolData:
-              if (data.interval === "60" && data.dataType === "SumVolume") {
+                break;
+              default:
                 msgData = {
-                  MessageType: "GetMinuteVolData",
-                  Request: {
-                    count: optionVolListNifty.length,
-                    Interval: "60",
-                    Exchange: exchange,
-                    Duration: duration,
+                  MessageType: "RequestError",
+                  Result: {
+                    Message:
+                      "Wrong Request Type! (GetMinuteData, GetTickData, GetMinuteVolData, GetTickVolData) these are only valid requestTypes.",
                   },
-                  Result: data,
                 };
-              }
-              break;
-            case types.GetTickVolData:
-              if (data.interval === "30" && data.dataType === "SumVolume") {
-                msgData = {
-                  MessageType: "GetTickVolData",
-                  Request: {
-                    count: optionTickVolListNifty.length,
-                    Interval: "30",
-                    Exchange: exchange,
-                    Duration: duration,
-                  },
-                  Result: data,
-                };
-              }
-              break;
-            default:
-              msgData = {
-                MessageType: "RequestError",
-                Result: {
-                  Message:
-                    "Wrong Request Type! (GetMinuteData, GetTickData, GetMinuteVolData, GetTickVolData) these are only valid requestTypes.",
-                },
-              };
-          }
-        } else if (
-          exchange === product.BANKNIFTY &&
-          data.exchange === product.BANKNIFTY
-        ) {
-          switch (requestType) {
-            case types.GetMinuteData:
-              if (data.interval === "60" && data.dataType === "ExpoAverage") {
-                if (data.duration === duration) {
-                  msgData = {
-                    MessageType: "GetMinuteData",
-                    Request: {
-                      count: finalListBankNifty[duration].length,
-                      Interval: "60",
-                      Exchange: exchange,
-                      Duration: duration,
-                    },
-                    Result: data,
-                  };
+            }
+          } else if (
+            exchange === product.BANKNIFTY &&
+            data.exchange === product.BANKNIFTY
+          ) {
+            switch (requestType) {
+              case types.GetMinuteData:
+                if (data.interval === "60" && data.dataType === "ExpoAverage") {
+                  if (data.duration === duration) {
+                    msgData = {
+                      MessageType: "GetMinuteData",
+                      Request: {
+                        count: finalListBankNifty[duration].length,
+                        Interval: "60",
+                        Exchange: exchange,
+                        Duration: duration,
+                      },
+                      Result: data,
+                    };
+                  }
                 }
-              }
-              break;
-            case types.GetTickData:
-              if (data.interval === "30" && data.dataType === "ExpoAverage") {
-                if (data.duration === duration) {
-                  msgData = {
-                    MessageType: "GetTickData",
+                break;
+              case types.GetTickData:
+                if (data.interval === "30" && data.dataType === "ExpoAverage") {
+                  if (data.duration === duration) {
+                    msgData = {
+                      MessageType: "GetTickData",
+                      Request: {
+                        count: finalTicklListBankNifty[duration].length,
+                        Interval: "30",
+                        Exchange: exchange,
+                        Duration: duration,
+                      },
+                      Result: data,
+                    };
+                  }
+                }
+                break;
+              case types.GetMinuteVolData:
+                if (data.interval === "60" && data.dataType === "SumVolume") {
+                  const msgData = {
+                    MessageType: "GetTickVolData",
                     Request: {
-                      count: finalTicklListBankNifty[duration].length,
+                      count: optionTickVolListBankNifty.length,
                       Interval: "30",
                       Exchange: exchange,
                       Duration: duration,
@@ -126,48 +142,46 @@ module.exports = {
                     Result: data,
                   };
                 }
-              }
-              break;
-            case types.GetMinuteVolData:
-              if (data.interval === "60" && data.dataType === "SumVolume") {
-                const msgData = {
-                  MessageType: "GetTickVolData",
-                  Request: {
-                    count: optionTickVolListBankNifty.length,
-                    Interval: "30",
-                    Exchange: exchange,
-                    Duration: duration,
+                break;
+              case types.GetTickVolData:
+                if (data.interval === "30" && data.dataType === "SumVolume") {
+                  const msgData = {
+                    MessageType: "GetTickVolData",
+                    Request: {
+                      count: optionTickVolListBankNifty.length,
+                      Interval: "30",
+                      Exchange: exchange,
+                      Duration: duration,
+                    },
+                    Result: data,
+                  };
+                }
+                break;
+              default:
+                msgData = {
+                  MessageType: "RequestError",
+                  Result: {
+                    Message:
+                      "Wrong Exchange Name! (NIFTY, BANKNIFTY) these are only valid exchanges.",
                   },
-                  Result: data,
                 };
-              }
-              break;
-            case types.GetTickVolData:
-              if (data.interval === "30" && data.dataType === "SumVolume") {
-                const msgData = {
-                  MessageType: "GetTickVolData",
-                  Request: {
-                    count: optionTickVolListBankNifty.length,
-                    Interval: "30",
-                    Exchange: exchange,
-                    Duration: duration,
-                  },
-                  Result: data,
-                };
-              }
-              break;
-            default:
-              msgData = {
-                MessageType: "RequestError",
-                Result: {
-                  Message:
-                    "Wrong Exchange Name! (NIFTY, BANKNIFTY) these are only valid exchanges.",
-                },
-              };
+            }
           }
-        }
-        if (msgData !== "") {
-          ws.send(JSON.stringify(msgData));
+          if(requestType === "ServerInfo") {
+            msgData = {
+              Request: {
+                MessageType: "ServerInfo",
+                date: moment().toDate()
+              },
+              Result: {
+                message: data
+              }
+            }
+            ws.send(JSON.stringify(msgData))
+          }
+          if (msgData !== "") {
+            ws.send(JSON.stringify(msgData));
+          }
         }
       }
     });
