@@ -102,7 +102,8 @@ module.exports = {
               rule.minute = parseInt(exchange);
               console.log("initiating schedule, ", rule.hour, rule.minute)
               const job = schedule.scheduleJob("sch", rule, () => {
-                const msg5 = "Global data instance initiated!, ";
+                const msg5 = "Global data instance initiated!, " + moment().toDate();
+                console.log(msg5)
               });
             }
             if(requestType === "Connect") {
