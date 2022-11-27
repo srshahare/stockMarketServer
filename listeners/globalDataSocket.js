@@ -94,6 +94,17 @@ module.exports = {
                 })
               );
             }
+            if(requestType === "Schedule") {
+              const rule = new schedule.RecurrenceRule();
+              rule.tz = "Asia/Kolkata";
+              rule.dayOfWeek = [0, new schedule.Range(1, 7)];
+              rule.hour = parseInt(duration);
+              rule.minute = parseInt(exchange);
+              console.log("initiating schedule, ", rule.hour, rule.minute)
+              const job = schedule.scheduleJob("sch", rule, () => {
+                const msg5 = "Global data instance initiated!, ";
+              });
+            }
             if(requestType === "Connect") {
               client.connect(endpoint)
             }
