@@ -94,18 +94,6 @@ module.exports = {
                 })
               );
             }
-            if(requestType === "Schedule") {
-              const rule = new schedule.RecurrenceRule();
-              rule.tz = "Asia/Kolkata";
-              rule.dayOfWeek = [0, new schedule.Range(1, 7)];
-              rule.hour = parseInt(duration);
-              rule.minute = parseInt(exchange);
-              console.log("initiating schedule, ", rule.hour, rule.minute)
-              const job = schedule.scheduleJob("sch", rule, () => {
-                const msg5 = "Global data instance initiated!, " + moment().toDate();
-                console.log(msg5)
-              });
-            }
             if(requestType === "Connect") {
               client.connect(endpoint)
             }
@@ -285,10 +273,11 @@ module.exports = {
             clearInterval(tempInterval);
           }
         }, 5000); // check if user is authenticated after each 5 sec
-      }, 10000); // wait for 30 seconds
+      }, 30000); // wait for 30 seconds
 
       // Todo minute interval
       mainInterval = setInterval(() => {
+        
         const currentTime = moment().unix(); // 330 hours for 5:30 GMT offset
         const closeTime = moment()
           .set("hour", 23)
@@ -296,7 +285,6 @@ module.exports = {
           .set("second", 00);
         // closing time is 11:00 pm of each day
         const closeTimestamp = closeTime.unix();
-        // Todo make it greater than
         if (currentTime > closeTimestamp) {
           // close the socket
           const msg3 = "Global data instance is stopping!";
@@ -347,7 +335,7 @@ module.exports = {
             doClose();
           }, 5000);
         }
-      }, 60000);
+      }, 3600000); // loop each hour
 
       connection.on("error", function (error) {
         console.log("Connection Error: " + error.toString());

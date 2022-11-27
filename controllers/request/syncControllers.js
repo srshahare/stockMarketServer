@@ -5,7 +5,7 @@ const { socketFlag, socketInterval } = require("../../constants/socketFlag");
 module.exports = {
   syncControllers: (conn, subscribe) => {
     let syncInterval;
-    if (subscribe) {
+    if (subscribe && !socketFlag.isSyncing) {
       socketFlag.isSyncing = true;
       // generate future instrument identifier for NIFTY & BANKNIFTY
       // const instrumentId1 = generateInstrumentId(product.NIFTY);
@@ -15,7 +15,7 @@ module.exports = {
       const month = moment().month();
       const date = moment().date();
       const year = moment().year();
-      let fromTime = moment([year, month, 25, 9, 15, 00, 00]).unix();
+      let fromTime = moment([year, month, date, 9, 15, 00, 00]).unix();
 
       setTimeout(() => {
         GetFutureHistory(
@@ -56,7 +56,7 @@ module.exports = {
             );
           }, 100);
         }, 200);
-      }, 20000); // loop each 60 sec
+      }, 5000); // loop each 5 sec
     } else {
       clearInterval(socketInterval.syncInterval);
       socketFlag.isSyncing = false;
