@@ -94,8 +94,8 @@ module.exports = {
                 })
               );
             }
-            if(requestType === "Connect") {
-              client.connect(endpoint)
+            if (requestType === "Connect") {
+              client.connect(endpoint);
             }
             if (requestType === "Sync") {
               console.log("Server syncing the data points!");
@@ -257,14 +257,14 @@ module.exports = {
             rule.dayOfWeek = [0, new schedule.Range(1, 5)];
             rule.hour = 9;
             rule.minute = 15;
-            let msg1 = "minute controller initiated successfull!"
+            let msg1 = "minute controller initiated successfull!";
             console.log(msg1);
-            sendWSMessage(wsClient, msg1)
+            sendWSMessage(wsClient, msg1);
             minuteReqController(connection, wsClient);
             const reqJbo = schedule.scheduleJob("reqJob", rule, () => {
-              const msg2 ="tick controller initiated successfull!";
+              const msg2 = "tick controller initiated successfull!";
               console.log(msg2);
-              sendWSMessage(wsClient, msg2)
+              sendWSMessage(wsClient, msg2);
               tickReqController(connection, wsClient);
             });
           } else if (!AuthConnect || !initialized) {
@@ -273,11 +273,10 @@ module.exports = {
             clearInterval(tempInterval);
           }
         }, 5000); // check if user is authenticated after each 5 sec
-      }, 30000); // wait for 30 seconds
+      }, 10000); // wait for 10 seconds
 
       // Todo minute interval
       mainInterval = setInterval(() => {
-        
         const currentTime = moment().unix(); // 330 hours for 5:30 GMT offset
         const closeTime = moment()
           .set("hour", 23)
@@ -289,7 +288,7 @@ module.exports = {
           // close the socket
           const msg3 = "Global data instance is stopping!";
           console.log(msg3, moment().toDate());
-          sendWSMessage(wsClient, msg3)
+          sendWSMessage(wsClient, msg3);
           // clear all the intervals
           const {
             niftyPipeInterval,
@@ -352,23 +351,34 @@ module.exports = {
           const { utf8Data } = message;
           const data = JSON.parse(utf8Data);
 
+          if (data.MessageType !== "Echo") {
+            wsClient.clients.forEach((ws) => {
+              if (ws.isAlive) {
+                // ws.send(JSON.stringify(data));
+              }
+            });
+          }
+
           // storing NIFTY & BANKNIFTY 1 min snapshots
           // Todo : check the if stmt again to generate real time snapshot
           if (data.MessageType === messageTypes.RealtimeSnapshotResult) {
             socketFlag.isNewSnapshot = true;
             // const instrumentIdNifty = generateInstrumentId("NIFTY");
             const instrumentIdNifty = "NIFTY 50";
+            let fromTime = moment([year, month, date, 9, 14, 30, 00]).unix();
 
-            if (data.InstrumentIdentifier === instrumentIdNifty) {
-              dataListNifty.push(data);
-              socketFlag.isNewNiftySnapshot = true;
-              socketFlag.isExpoFinalDataNifty = false;
-              // saveSnapshot(data, "60", product.NIFTY);
-            } else {
-              dataListBankNifty.push(data);
-              socketFlag.isNewBankNiftySnapshot = true;
-              socketFlag.isExpoFinalDataBankNifty = false;
-              // saveSnapshot(data, "60", product.BANKNIFTY);
+            if (data.LastTradeTime >= fromTime) {
+              if (data.InstrumentIdentifier === instrumentIdNifty) {
+                dataListNifty.push(data);
+                socketFlag.isNewNiftySnapshot = true;
+                socketFlag.isExpoFinalDataNifty = false;
+                // saveSnapshot(data, "60", product.NIFTY);
+              } else {
+                dataListBankNifty.push(data);
+                socketFlag.isNewBankNiftySnapshot = true;
+                socketFlag.isExpoFinalDataBankNifty = false;
+                // saveSnapshot(data, "60", product.BANKNIFTY);
+              }
             }
           }
           // messages when get history for option symols for 1 min data
@@ -386,7 +396,7 @@ module.exports = {
               if (Result.length > 0) {
                 item = Result[0];
               }
-              if(Result.length === 0) {
+              if (Result.length === 0) {
                 clearInterval(socketInterval.syncInterval);
                 socketFlag.isSyncing = false;
                 console.log("Syncing has stopped!, ", moment().toDate());
@@ -403,7 +413,7 @@ module.exports = {
                 socketFlag.isExpoFinalDataNifty = false;
                 // saveSnapshot(item, interval, product.NIFTY);
               } else {
-                if(Result.length > 0) {
+                if (Result.length > 0) {
                   dataListBankNifty.push(item);
                 }
                 socketFlag.isNewBankNiftySnapshot = true;
@@ -411,50 +421,45 @@ module.exports = {
                 // saveSnapshot(item, interval, product.BANKNIFTY);
               }
             } else {
+              const userTag = String(Request.UserTag).split("_");
+              const productTag = userTag[0];
+              const optionTag = userTag[1];
+              let item = {
+                TradedQty: 0,
+                LastTradeTime: Request.From,
+              };
               if (Result.length > 0) {
-                const userTag = String(Request.UserTag).split("_");
-                const productTag = userTag[0];
-                const optionTag = userTag[1];
-                let item = {
-                  TradedQty: 0,
-                  LastTradeTime: Request.From,
-                };
-                if (Result.length > 0) {
-                  item = Result[0];
-                }
-                const listItem = {
-                  ...item,
-                  Product: productTag,
-                  OptionType: optionTag,
-                };
-                let interval = "60";
-                if (productTag === product.NIFTY) {
-                  optionReqListNifty.push(listItem);
-                  // save nifty option data to database
-                  // saveOptionData(
-                  //   listItem,
-                  //   interval,
-                  //   product.NIFTY,
-                  //   Request.InstrumentIdentifier
-                  // );
-                } else {
-                  optionReqListBankNifty.push(listItem);
-                  // save banknifty option data to database
-                  // saveOptionData(
-                  //   listItem,
-                  //   interval,
-                  //   product.BANKNIFTY,
-                  //   Request.InstrumentIdentifier
-                  // );
-                }
+                item = Result[0];
+              }
+              const listItem = {
+                ...item,
+                Product: productTag,
+                OptionType: optionTag,
+              };
+              let interval = "60";
+              if (productTag === product.NIFTY) {
+                optionReqListNifty.push(listItem);
+                // save nifty option data to database
+                // saveOptionData(
+                //   listItem,
+                //   interval,
+                //   product.NIFTY,
+                //   Request.InstrumentIdentifier
+                // );
+              } else {
+                optionReqListBankNifty.push(listItem);
+                // save banknifty option data to database
+                // saveOptionData(
+                //   listItem,
+                //   interval,
+                //   product.BANKNIFTY,
+                //   Request.InstrumentIdentifier
+                // );
               }
             }
           }
           // messages when get history option/future symbols for tick by tick result
-          else if (
-            data.MessageType === messageTypes.HistoryTickResult &&
-            data.MessageType !== messageTypes.RequestError
-          ) {
+          else if (data.MessageType === messageTypes.HistoryTickResult) {
             // check if string contains BANKNIFTY if yes then store in bankniftylist
             const { Request, Result } = data;
             const userTag = String(Request.UserTag);
@@ -488,45 +493,49 @@ module.exports = {
             }
             // messages for history option symbol
             else {
+              // loop through all 30 items of option histoy and add the volume and generate new option history item
+              let sumVol = 0;
+              const splitTag = userTag.split("_");
+              const productTag = splitTag[0];
+              const optionTag = splitTag[1];
+              const timestamp = splitTag[2];
+              let firstItem = {
+                LastTradeTime: parseInt(timestamp),
+                TradedQty: sumVol,
+              };
               if (Result.length > 0) {
-                // loop through all 30 items of option histoy and add the volume and generate new option history item
-                let sumVol = 0;
-                let firstItem = Result[0];
-                Result.forEach((item) => {
-                  const volume = parseFloat(item.TradedQty);
-                  sumVol = parseFloat(sumVol) + parseFloat(volume);
-                });
-                const splitTag = userTag.split("_");
-                const productTag = splitTag[0];
-                const optionTag = splitTag[1];
-                const timestamp = splitTag[2];
-                firstItem = {
-                  ...firstItem,
-                  LastTradeTime: parseInt(timestamp),
-                  TradedQty: sumVol,
-                };
-                const listItem = {
-                  ...firstItem,
-                  Product: productTag,
-                  OptionType: optionTag,
-                };
-                if (productTag === product.NIFTY) {
-                  optionTickReqListNifty.push(listItem);
-                  // saveOptionData(
-                  //   listItem,
-                  //   interval,
-                  //   product.NIFTY,
-                  //   Request.InstrumentIdentifier
-                  // );
-                } else {
-                  optionTickReqListBankNifty.push(listItem);
-                  // saveOptionData(
-                  //   listItem,
-                  //   interval,
-                  //   product.BANKNIFTY,
-                  //   Request.InstrumentIdentifier
-                  // );
-                }
+                firstItem = Result[0];
+              }
+              Result.forEach((item) => {
+                const volume = parseFloat(item.TradedQty);
+                sumVol = parseFloat(sumVol) + parseFloat(volume);
+              });
+              firstItem = {
+                ...firstItem,
+                LastTradeTime: parseInt(timestamp),
+                TradedQty: sumVol,
+              };
+              const listItem = {
+                ...firstItem,
+                Product: productTag,
+                OptionType: optionTag,
+              };
+              if (productTag === product.NIFTY) {
+                optionTickReqListNifty.push(listItem);
+                // saveOptionData(
+                //   listItem,
+                //   interval,
+                //   product.NIFTY,
+                //   Request.InstrumentIdentifier
+                // );
+              } else {
+                optionTickReqListBankNifty.push(listItem);
+                // saveOptionData(
+                //   listItem,
+                //   interval,
+                //   product.BANKNIFTY,
+                //   Request.InstrumentIdentifier
+                // );
               }
             }
           }
@@ -535,9 +544,9 @@ module.exports = {
 
       function doClose() {
         connection.close();
-        const msg4 = "Global data instance has stopped!"
+        const msg4 = "Global data instance has stopped!";
         console.log(msg4, moment().toDate());
-        sendWSMessage(wsClient, msg4)
+        sendWSMessage(wsClient, msg4);
       }
 
       function callAPI(request) {
@@ -558,8 +567,8 @@ module.exports = {
     // Todo uncomment and schedule handling
     const job = schedule.scheduleJob("globalSocket", rule, () => {
       const msg5 = "Global data instance initiated!, ";
-      console.log(msg5, moment().toDate())
-      sendWSMessage(wsClient, msg5)
+      console.log(msg5, moment().toDate());
+      sendWSMessage(wsClient, msg5);
       client.connect(endpoint);
     });
   },

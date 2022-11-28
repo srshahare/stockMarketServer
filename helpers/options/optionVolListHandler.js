@@ -183,7 +183,7 @@ module.exports = {
   generateSumOfTickVolOptionListNifty: (tradeTime, wss) => {
     const niftyList = optionTickReqListNifty;
     let niftyInterval;
-
+    
     // set interval for nifty
     niftyInterval = setInterval(() => {
       if (
