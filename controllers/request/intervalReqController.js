@@ -38,10 +38,10 @@ module.exports = {
     // SubscribeSnapshot(conn, instrumentId1);
     // SubscribeSnapshot(conn, instrumentId2);
 
-    // setTimeout(() => {
-    //   console.log("Data syncing initiated!")
-    //   syncControllers(conn, true);
-    // }, 5000);
+    setTimeout(() => {
+      console.log("Data syncing initiated!")
+      syncControllers(conn, true);
+    }, 5000);
 
     setTimeout(() => {
       let checkInterval = setInterval(() => {
