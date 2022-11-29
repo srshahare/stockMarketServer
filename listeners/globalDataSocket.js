@@ -365,6 +365,9 @@ module.exports = {
             socketFlag.isNewSnapshot = true;
             // const instrumentIdNifty = generateInstrumentId("NIFTY");
             const instrumentIdNifty = "NIFTY 50";
+            const month = moment().month();
+            const date = moment().date();
+            const year = moment().year();
             let fromTime = moment([year, month, date, 9, 14, 30, 00]).unix();
 
             if (data.LastTradeTime >= fromTime) {
