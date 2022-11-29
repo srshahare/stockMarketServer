@@ -35,28 +35,28 @@ module.exports = {
     generatePipeline(conn, wss, product.NIFTY);
     generatePipeline(conn, wss, product.BANKNIFTY);
 
-    // SubscribeSnapshot(conn, instrumentId1);
-    // SubscribeSnapshot(conn, instrumentId2);
+    SubscribeSnapshot(conn, instrumentId1);
+    SubscribeSnapshot(conn, instrumentId2);
 
-    setTimeout(() => {
-      console.log("Data syncing initiated!")
-      syncControllers(conn, true);
-    }, 5000);
+    // setTimeout(() => {
+    //   console.log("Data syncing initiated!")
+    //   syncControllers(conn, true);
+    // }, 5000);
 
-    setTimeout(() => {
-      let checkInterval = setInterval(() => {
-        if (!socketFlag.isSyncing) {
-          console.log("subscribing to snapshots!");
-          SubscribeSnapshot(conn, instrumentId1);
-          // subscribe for NIFTY
-          // Todo : Uncomment for nifty snapshot data
-          // subscribe for BANKNIFTY
-          // Todo : Uncomment for banknifty snapshot data
-          SubscribeSnapshot(conn, instrumentId2);
-          clearInterval(checkInterval);
-        }
-      }, 1000);
-    }, 10000);
+    // setTimeout(() => {
+    //   let checkInterval = setInterval(() => {
+    //     if (!socketFlag.isSyncing) {
+    //       console.log("subscribing to snapshots!");
+    //       SubscribeSnapshot(conn, instrumentId1);
+    //       // subscribe for NIFTY
+    //       // Todo : Uncomment for nifty snapshot data
+    //       // subscribe for BANKNIFTY
+    //       // Todo : Uncomment for banknifty snapshot data
+    //       SubscribeSnapshot(conn, instrumentId2);
+    //       clearInterval(checkInterval);
+    //     }
+    //   }, 1000);
+    // }, 10000);
 
     // // subscribe for NIFTY & BANKNIFTY
     // // first time call
