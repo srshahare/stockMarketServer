@@ -257,12 +257,13 @@ module.exports = {
             rule.dayOfWeek = [0, new schedule.Range(1, 5)];
             rule.hour = 9;
             rule.minute = 15;
-            let msg1 = "minute controller initiated successfull!";
+            rule.second = 1;
+            let msg1 = "minute controller initiated successfully!";
             console.log(msg1);
             sendWSMessage(wsClient, msg1);
             minuteReqController(connection, wsClient);
             const reqJbo = schedule.scheduleJob("reqJob", rule, () => {
-              const msg2 = "tick controller initiated successfull!";
+              const msg2 = "tick controller initiated successfully!";
               console.log(msg2);
               sendWSMessage(wsClient, msg2);
               tickReqController(connection, wsClient);
@@ -477,6 +478,12 @@ module.exports = {
               if (Result.length > 0) {
                 listItem = Result[0];
               }
+              
+              if (Result.length === 0) {
+                // clearInterval(socketInterval.syncInterval);
+                // socketFlag.isSyncing = false;
+                // console.log("Syncing has stopped!, ", moment().toDate());
+              }
               socketTickFlag.isNewTickSnapshot = true;
               // const instrumentIdNifty = generateInstrumentId("NIFTY");
               const instrumentIdNifty = "NIFTY 50";
@@ -484,13 +491,11 @@ module.exports = {
                 dataTickListNifty.push(listItem);
                 socketTickFlag.isNewTickNiftySnapshot = true;
                 socketTickFlag.isExpoTickFinalData = false;
-                // save nifty option data to database
                 // saveSnapshot(listItem, interval, product.NIFTY);
               } else {
                 dataTickListBankNifty.push(listItem);
                 socketTickFlag.isNewTickBankNiftySnapshot = true;
                 socketTickFlag.isExpoTickFinalDataBankNifty = false;
-                // save bank nifty option data to database
                 // saveSnapshot(listItem, interval, product.BANKNIFTY);
               }
             }

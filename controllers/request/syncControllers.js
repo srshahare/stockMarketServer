@@ -1,11 +1,12 @@
 const moment = require("moment");
-const { GetFutureHistory } = require("../../listeners/socketManager");
+const { GetFutureHistory, GetFutureTickHistory } = require("../../listeners/socketManager");
 const { socketFlag, socketInterval } = require("../../constants/socketFlag");
 
 module.exports = {
   syncControllers: (conn, subscribe) => {
     let syncInterval;
     if (subscribe && !socketFlag.isSyncing) {
+      console.log("Data syncing initiated!");
       socketFlag.isSyncing = true;
       // generate future instrument identifier for NIFTY & BANKNIFTY
       // const instrumentId1 = generateInstrumentId(product.NIFTY);
@@ -18,7 +19,7 @@ module.exports = {
       let fromTime = moment([year, month, date, 9, 15, 00, 00]).unix();
 
       setTimeout(() => {
-        GetFutureHistory(
+        GetFutureTickHistory(
           conn,
           instrumentId1,
           fromTime,
@@ -27,7 +28,7 @@ module.exports = {
         );
       }, 100);
       setTimeout(() => {
-        GetFutureHistory(
+        GetFutureTickHistory(
           conn,
           instrumentId2,
           fromTime,
@@ -37,9 +38,9 @@ module.exports = {
       }, 100);
       // loop calls
       socketInterval.syncInterval = setInterval(() => {
-        fromTime = fromTime + 60;
+        fromTime = fromTime + 30;
         setTimeout(() => {
-          GetFutureHistory(
+          GetFutureTickHistory(
             conn,
             instrumentId1,
             fromTime,
@@ -47,7 +48,7 @@ module.exports = {
             "FutureHistory"
           );
           setTimeout(() => {
-            GetFutureHistory(
+            GetFutureTickHistory(
               conn,
               instrumentId2,
               fromTime,

@@ -113,6 +113,7 @@ module.exports = {
     // create 2 tick pipeline for NIFTY(PE/CE) & BANKN IFTY(PE/CE)
     generateTickPipeline(conn, wss, product.NIFTY);
     generateTickPipeline(conn, wss, product.BANKNIFTY);
+    
 
     // subscribe for NIFTY & BANKNIFTY
     // first time call
@@ -152,7 +153,7 @@ module.exports = {
           fromTime,
           "FutureHistory"
         );
-      }, 500);
+      }, 1000);
     }, 30000); // loop each 30 sec
   },
 };
