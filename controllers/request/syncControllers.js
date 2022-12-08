@@ -19,7 +19,7 @@ module.exports = {
       let fromTime = moment([year, month, date, 9, 15, 00, 00]).unix();
 
       setTimeout(() => {
-        GetFutureTickHistory(
+        GetFutureHistory(
           conn,
           instrumentId1,
           fromTime,
@@ -28,7 +28,7 @@ module.exports = {
         );
       }, 100);
       setTimeout(() => {
-        GetFutureTickHistory(
+        GetFutureHistory(
           conn,
           instrumentId2,
           fromTime,
@@ -38,9 +38,9 @@ module.exports = {
       }, 100);
       // loop calls
       socketInterval.syncInterval = setInterval(() => {
-        fromTime = fromTime + 30;
+        fromTime = fromTime + 60;
         setTimeout(() => {
-          GetFutureTickHistory(
+          GetFutureHistory(
             conn,
             instrumentId1,
             fromTime,
@@ -48,7 +48,7 @@ module.exports = {
             "FutureHistory"
           );
           setTimeout(() => {
-            GetFutureTickHistory(
+            GetFutureHistory(
               conn,
               instrumentId2,
               fromTime,
@@ -57,7 +57,7 @@ module.exports = {
             );
           }, 100);
         }, 200);
-      }, 5000); // loop each 5 sec
+      }, 20000); // loop each 5 sec
     } else {
       clearInterval(socketInterval.syncInterval);
       socketFlag.isSyncing = false;
