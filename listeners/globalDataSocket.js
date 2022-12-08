@@ -260,14 +260,14 @@ module.exports = {
             rule.minute = 15;
             rule.second = 1;
             let msg1 = "minute controller initiated successfully!";
+            const msg2 = "tick controller initiated successfully!";
             console.log(msg1);
             sendWSMessage(wsClient, msg1);
+            sendWSMessage(wsClient, msg2);
             minuteReqController(connection, wsClient);
             tickReqController(connection, wsClient);
             const reqJbo = schedule.scheduleJob("reqJob", rule, () => {
-              const msg2 = "tick controller initiated successfully!";
               console.log(msg2);
-              sendWSMessage(wsClient, msg2);
             });
           } else if (!AuthConnect || !initialized) {
             Authenticate();
@@ -607,7 +607,7 @@ module.exports = {
       const msg5 = "Global data instance initiated!, ";
       console.log(msg5, moment().toDate());
       sendWSMessage(wsClient, msg5);
+      client.connect(endpoint);
     });
-    client.connect(endpoint);
   },
 };
