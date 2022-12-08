@@ -18,7 +18,7 @@ app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 
 //Todo Database Configuration
-db.sequelize.sync({ force: true }).then(() => {
+db.sequelize.sync({ force: false }).then(() => {
   console.log("DB Synced!");
 });
 

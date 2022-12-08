@@ -1,6 +1,7 @@
 const moment = require("moment");
 const option = require("../../constants/option");
 const product = require("../../constants/product");
+const chart = require("../../constants/chart")
 const { socketFlag, socketTickFlag } = require("../../constants/socketFlag");
 const {
   optionVolListNifty,
@@ -15,6 +16,7 @@ const {
   finalTicklListBankNifty,
 } = require("../../helpers/queue/dataTickQueue");
 const { sendWSMessage } = require("../../helpers/sendMessage");
+const { saveExpoAvgData } = require("../database/expoAvgController");
 
 module.exports = {
   generateExpoDataNifty: (tradeTime, duration, wss) => {
@@ -29,16 +31,16 @@ module.exports = {
         "60"
       );
       pushExpoItem(listItem, intervalDuration, product.NIFTY);
-      socketFlag.isExpoFinalDataNifty = true
+      socketFlag.isExpoFinalDataNifty = true;
       // save expo avg data to db
-      //todo saveExpoAvgData(
-      //   listItem,
-      //   "60",
-      //   intervalDuration,
-      //   product.NIFTY,
-      //   chart.STANDARD
-      // );
-      sendWSMessage(wss, listItem)
+      saveExpoAvgData(
+        listItem,
+        "60",
+        intervalDuration,
+        product.NIFTY,
+        chart.STANDARD
+      );
+      sendWSMessage(wss, listItem);
     } else if (optionVolListNifty.length > intervalDuration) {
       const tempVolListNifty = [...optionVolListNifty];
       const tempFinalListNifty = generateTempFinalList(
@@ -56,16 +58,16 @@ module.exports = {
         "60"
       );
       pushExpoItem(listItem, intervalDuration, product.NIFTY);
-      socketFlag.isExpoFinalDataNifty = true
+      socketFlag.isExpoFinalDataNifty = true;
       // save expo avg data to db
-      //todo saveExpoAvgData(
-      //   listItem,
-      //   "60",
-      //   intervalDuration,
-      //   product.NIFTY,
-      //   chart.STANDARD
-      // );
-      sendWSMessage(wss, listItem)
+      saveExpoAvgData(
+        listItem,
+        "60",
+        intervalDuration,
+        product.NIFTY,
+        chart.STANDARD
+      );
+      sendWSMessage(wss, listItem);
     }
   },
   generateExpoDataBankNifty: (tradeTime, duration, wss) => {
@@ -80,16 +82,16 @@ module.exports = {
         "60"
       );
       pushExpoItem(listItem, intervalDuration, product.BANKNIFTY);
-      socketFlag.isExpoFinalDataBankNifty = true
+      socketFlag.isExpoFinalDataBankNifty = true;
       // save expo avg data to db
-      //todo saveExpoAvgData(
-      //   listItem,
-      //   "60",
-      //   intervalDuration,
-      //   product.BANKNIFTY,
-      //   chart.STANDARD
-      // );
-      sendWSMessage(wss, listItem)
+      saveExpoAvgData(
+        listItem,
+        "60",
+        intervalDuration,
+        product.BANKNIFTY,
+        chart.STANDARD
+      );
+      sendWSMessage(wss, listItem);
     } else if (optionVolListBankNifty.length > intervalDuration) {
       const tempVolListBankNifty = [...optionVolListBankNifty];
       const tempFinalListBankNifty = generateTempFinalList(
@@ -107,16 +109,16 @@ module.exports = {
         "60"
       );
       pushExpoItem(listItem, intervalDuration, product.BANKNIFTY);
-      socketFlag.isExpoFinalDataBankNifty = true
+      socketFlag.isExpoFinalDataBankNifty = true;
       // save expo avg data to db
-      //todo saveExpoAvgData(
-      //   listItem,
-      //   "60",
-      //   intervalDuration,
-      //   product.BANKNIFTY,
-      //   chart.STANDARD
-      // );
-      sendWSMessage(wss, listItem)
+      saveExpoAvgData(
+        listItem,
+        "60",
+        intervalDuration,
+        product.BANKNIFTY,
+        chart.STANDARD
+      );
+      sendWSMessage(wss, listItem);
     }
   },
   generateExpoTickDataNifty: (tradeTime, duration, wss) => {
@@ -131,16 +133,16 @@ module.exports = {
         "30"
       );
       pushTickExpoItem(listItem, intervalDuration, product.NIFTY);
-      socketTickFlag.isExpoTickFinalData = true
+      socketTickFlag.isExpoTickFinalData = true;
       // save expo avg data to db
-      //todo saveExpoAvgData(
-      //   listItem,
-      //   "30",
-      //   parseInt(intervalDuration),
-      //   product.NIFTY,
-      //   chart.STANDARD
-      // );
-      sendWSMessage(wss, listItem)
+      saveExpoAvgData(
+        listItem,
+        "30",
+        parseInt(intervalDuration),
+        product.NIFTY,
+        chart.STANDARD
+      );
+      sendWSMessage(wss, listItem);
     } else if (optionTickVolListNifty.length > intervalDuration) {
       const tempVolListNifty = [...optionTickVolListNifty];
       const tempFinalListNifty = generateTempTickFinalList(
@@ -158,16 +160,16 @@ module.exports = {
         "30"
       );
       pushTickExpoItem(listItem, intervalDuration, product.NIFTY);
-      socketTickFlag.isExpoTickFinalData = true
+      socketTickFlag.isExpoTickFinalData = true;
       // save expo avg data to db
-      //todo saveExpoAvgData(
-      //   listItem,
-      //   "30",
-      //   parseInt(intervalDuration),
-      //   product.NIFTY,
-      //   chart.STANDARD
-      // );
-      sendWSMessage(wss, listItem)
+      saveExpoAvgData(
+        listItem,
+        "30",
+        parseInt(intervalDuration),
+        product.NIFTY,
+        chart.STANDARD
+      );
+      sendWSMessage(wss, listItem);
     }
   },
   generateExpoTickDataBankNifty: (tradeTime, duration, wss) => {
@@ -182,16 +184,16 @@ module.exports = {
         "30"
       );
       pushTickExpoItem(listItem, intervalDuration, product.BANKNIFTY);
-      socketTickFlag.isExpoTickFinalDataBankNifty = true
+      socketTickFlag.isExpoTickFinalDataBankNifty = true;
       // save expo avg data to db
-      //todo saveExpoAvgData(
-      //   listItem,
-      //   "30",
-      //   parseInt(intervalDuration),
-      //   product.BANKNIFTY,
-      //   chart.STANDARD
-      // );
-      sendWSMessage(wss, listItem)
+      saveExpoAvgData(
+        listItem,
+        "30",
+        parseInt(intervalDuration),
+        product.BANKNIFTY,
+        chart.STANDARD
+      );
+      sendWSMessage(wss, listItem);
     } else if (optionTickVolListBankNifty.length > intervalDuration) {
       const tempVolListBankNifty = [...optionTickVolListBankNifty];
       const tempFinalListBankNifty = generateTempTickFinalList(
@@ -209,16 +211,16 @@ module.exports = {
         "30"
       );
       pushTickExpoItem(listItem, intervalDuration, product.BANKNIFTY);
-      socketTickFlag.isExpoTickFinalDataBankNifty = true
+      socketTickFlag.isExpoTickFinalDataBankNifty = true;
       // save expo avg data to db
-      //todo saveExpoAvgData(
-      //   listItem,
-      //   "30",
-      //   parseInt(intervalDuration),
-      //   product.BANKNIFTY,
-      //   chart.STANDARD
-      // );
-      sendWSMessage(wss, listItem)
+      saveExpoAvgData(
+        listItem,
+        "30",
+        parseInt(intervalDuration),
+        product.BANKNIFTY,
+        chart.STANDARD
+      );
+      sendWSMessage(wss, listItem);
     }
   },
 };
@@ -239,8 +241,8 @@ function pushExpoItem(listItem, duration, exchange) {
   }
 }
 function pushTickExpoItem(listItem, duration, exchange) {
-  if(!listItem) {
-    return
+  if (!listItem) {
+    return;
   }
   switch (exchange) {
     case product.NIFTY:
@@ -284,7 +286,13 @@ function generateTempTickFinalList(duration, exchange) {
   return tempFinalList;
 }
 
-function generateFirstExpoAvg(volumeList, duration, tradeTime, exchange, interval) {
+function generateFirstExpoAvg(
+  volumeList,
+  duration,
+  tradeTime,
+  exchange,
+  interval
+) {
   const firstElementColl = volumeList.slice(0, duration);
   let sumCE = 0;
   let sumPE = 0;
@@ -321,7 +329,14 @@ function generateFirstExpoAvg(volumeList, duration, tradeTime, exchange, interva
   return listItem;
 }
 
-function generateExpoAvg(volListItem, previousItem, tradeTime, duration, exchange, interval) {
+function generateExpoAvg(
+  volListItem,
+  previousItem,
+  tradeTime,
+  duration,
+  exchange,
+  interval
+) {
   const { CE, PE } = volListItem;
 
   const prevAvgCE = parseFloat(previousItem.CE.Volume);

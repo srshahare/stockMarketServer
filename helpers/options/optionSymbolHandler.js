@@ -20,7 +20,7 @@ module.exports = {
       const snapshotItem = dataList[0];
       tradeTime = snapshotItem.LastTradeTime;
       strikePrice = isTickData
-      ? snapshotItem.LastTradePrice
+      ? snapshotItem.LastTradePrice ? snapshotItem.LastTradePrice: snapshotItem.Close
       : snapshotItem.Close;
     }
 
@@ -86,7 +86,7 @@ module.exports = {
       const snapshotItem = dataList[0];
       tradeTime = snapshotItem.LastTradeTime
       strikePrice = isTickData
-      ? snapshotItem.LastTradePrice
+      ? snapshotItem.LastTradePrice ? snapshotItem.LastTradePrice: snapshotItem.Close
       : snapshotItem.Close;
     }
 

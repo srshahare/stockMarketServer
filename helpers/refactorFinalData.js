@@ -13,20 +13,11 @@ module.exports = {
       if(type === "expo") {
         const { expoAvgData, exchangeName, interval, duration } = item;
         const avgData = JSON.parse(expoAvgData);
-        obj = {
-          ...avgData,
-          exchangeName,
-          interval,
-          duration,
-        };
+        obj = avgData
       }else {
         const { volumeData, exchangeName, interval } = item;
         const volData = JSON.parse(volumeData);
-        obj = {
-          ...volData,
-          exchangeName,
-          interval,
-        };
+        obj = volData;
       }
       newList.push(obj)
     });

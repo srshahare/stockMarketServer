@@ -7,14 +7,14 @@ function callAPI(request, connection) {
 }
 
 module.exports = {
-  SubscribeSnapshot: (connection, instrumentId) => {
+  SubscribeSnapshot: (connection, instrumentId, unsubscribe) => {
     if (connection.connected) {
       var ExchangeName = "NSE_IDX"; //GFDL : Supported Values : NFO, NSE, NSE_IDX, CDS, MCX. Mandatory Parameter
       // var InstIdentifier = "NIFTY-I";
       var InstIdentifier = instrumentId;
       var Periodicity = "Minute"; //GFDL : Supported values are : Minute, Hour
       var Period = 1; //GFDL : Supported values are : 1,2,5,10,15,30 (for Minute Periodicity ONLY)
-      var Unsubscribe = "false"; //GFDL : To stop data subscription for this symbol, send this value as "true"
+      var Unsubscribe = unsubscribe; //GFDL : To stop data subscription for this symbol, send this value as "true"
 
       request =
         '{"MessageType":"SubscribeSnapshot","Exchange":"' +

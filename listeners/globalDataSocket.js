@@ -35,11 +35,8 @@ const {
 } = require("../helpers/queue/dataTickQueue");
 const { saveOptionData } = require("../controllers/database/optionController");
 const { saveSnapshot } = require("../controllers/database/snapshotController");
-const {
-  fetchLatestExpoAvgData,
-} = require("../controllers/database/expoAvgController");
-const { syncControllers } = require("../controllers/request/syncControllers");
 const { sendWSMessage } = require("../helpers/sendMessage");
+const { syncControllers } = require("../controllers/request/syncControllers");
 
 var client = new websocketClient();
 
@@ -95,11 +92,15 @@ module.exports = {
               );
             }
             if (requestType === "Connect") {
-              client.connect(endpoint);
+              conn.close()
+              const msg4 = "Global data instance has stopped!";
+              console.log(msg4, moment().toDate());
+              setTimeout(() => {
+                client.connect(endpoint);
+              }, 3000) // connect after 3 seconds
             }
-            if (requestType === "Sync") {
-              console.log("Server syncing the data points!");
-              syncControllers(conn, subscribe);
+            if(requestType === "Sync") {
+              syncControllers(conn)
             }
             if (requestType === types.GetMinuteData) {
               // send first chunk of data
@@ -262,11 +263,11 @@ module.exports = {
             console.log(msg1);
             sendWSMessage(wsClient, msg1);
             minuteReqController(connection, wsClient);
+            tickReqController(connection, wsClient);
             const reqJbo = schedule.scheduleJob("reqJob", rule, () => {
               const msg2 = "tick controller initiated successfully!";
               console.log(msg2);
               sendWSMessage(wsClient, msg2);
-              tickReqController(connection, wsClient);
             });
           } else if (!AuthConnect || !initialized) {
             Authenticate();
@@ -278,6 +279,7 @@ module.exports = {
 
       // Todo minute interval
       mainInterval = setInterval(() => {
+        moment.tz.setDefault("Asia/Kolkata");
         const currentTime = moment().unix(); // 330 hours for 5:30 GMT offset
         const closeTime = moment()
           .set("hour", 23)
@@ -374,14 +376,30 @@ module.exports = {
             if (data.LastTradeTime >= fromTime) {
               if (data.InstrumentIdentifier === instrumentIdNifty) {
                 dataListNifty.push(data);
+                dataTickListNifty.push(data);
+
+                // for min data
                 socketFlag.isNewNiftySnapshot = true;
                 socketFlag.isExpoFinalDataNifty = false;
-                // saveSnapshot(data, "60", product.NIFTY);
+                saveSnapshot(data, "60", product.NIFTY);
+
+                // for tick data
+                socketTickFlag.isNewTickNiftySnapshot = true;
+                socketTickFlag.isExpoTickFinalData = false;
+                saveSnapshot(data, "30", product.NIFTY);
               } else {
                 dataListBankNifty.push(data);
+                dataTickListBankNifty.push(data);
+
+                // for min data
                 socketFlag.isNewBankNiftySnapshot = true;
                 socketFlag.isExpoFinalDataBankNifty = false;
-                // saveSnapshot(data, "60", product.BANKNIFTY);
+                saveSnapshot(data, "60", product.BANKNIFTY);
+
+                // for tick data
+                socketTickFlag.isNewTickBankNiftySnapshot = true;
+                socketTickFlag.isExpoTickFinalDataBankNifty = false;
+                saveSnapshot(data, "30", product.BANKNIFTY);
               }
             }
           }
@@ -400,29 +418,39 @@ module.exports = {
               if (Result.length > 0) {
                 item = Result[0];
               }
-              if (Result.length === 0) {
-                clearInterval(socketInterval.syncInterval);
-                socketFlag.isSyncing = false;
-                console.log("Syncing has stopped!, ", moment().toDate());
-              }
               socketFlag.isNewSnapshot = true;
               let interval = "60";
+              let tickInterval = "30";
               // const instrumentIdNifty = generateInstrumentId("NIFTY");
               const instrumentIdNifty = "NIFTY 50";
               if (Request.InstrumentIdentifier === instrumentIdNifty) {
                 if (Result.length > 0) {
                   dataListNifty.push(item);
+                  dataTickListNifty.push(item);
                 }
+                // for min data
                 socketFlag.isNewNiftySnapshot = true;
                 socketFlag.isExpoFinalDataNifty = false;
-                // saveSnapshot(item, interval, product.NIFTY);
+                saveSnapshot(item, interval, product.NIFTY);
+
+                // for tick data
+                socketTickFlag.isNewTickNiftySnapshot = true;
+                socketTickFlag.isExpoTickFinalData = false;
+                saveSnapshot(item, tickInterval, product.NIFTY);
               } else {
                 if (Result.length > 0) {
                   dataListBankNifty.push(item);
+                  dataTickListBankNifty.push(item);
                 }
+                // for min data
                 socketFlag.isNewBankNiftySnapshot = true;
                 socketFlag.isExpoFinalDataBankNifty = false;
-                // saveSnapshot(item, interval, product.BANKNIFTY);
+                saveSnapshot(item, interval, product.BANKNIFTY);
+
+                // for tick data
+                socketTickFlag.isNewTickBankNiftySnapshot = true;
+                socketTickFlag.isExpoTickFinalDataBankNifty = false;
+                saveSnapshot(item, tickInterval, product.BANKNIFTY);
               }
             } else {
               const userTag = String(Request.UserTag).split("_");
@@ -444,21 +472,21 @@ module.exports = {
               if (productTag === product.NIFTY) {
                 optionReqListNifty.push(listItem);
                 // save nifty option data to database
-                // saveOptionData(
-                //   listItem,
-                //   interval,
-                //   product.NIFTY,
-                //   Request.InstrumentIdentifier
-                // );
+                saveOptionData(
+                  listItem,
+                  interval,
+                  product.NIFTY,
+                  Request.InstrumentIdentifier
+                );
               } else {
                 optionReqListBankNifty.push(listItem);
                 // save banknifty option data to database
-                // saveOptionData(
-                //   listItem,
-                //   interval,
-                //   product.BANKNIFTY,
-                //   Request.InstrumentIdentifier
-                // );
+                saveOptionData(
+                  listItem,
+                  interval,
+                  product.BANKNIFTY,
+                  Request.InstrumentIdentifier
+                );
               }
             }
           }
@@ -478,25 +506,28 @@ module.exports = {
               if (Result.length > 0) {
                 listItem = Result[0];
               }
-              
-              if (Result.length === 0) {
-                // clearInterval(socketInterval.syncInterval);
-                // socketFlag.isSyncing = false;
-                // console.log("Syncing has stopped!, ", moment().toDate());
-              }
+              // if (Result.length === 0) {
+              //   clearInterval(socketInterval.syncInterval);
+              //   socketFlag.isSyncing = false;
+              //   console.log("Syncing has stopped!, ", moment().toDate());
+              // }
               socketTickFlag.isNewTickSnapshot = true;
               // const instrumentIdNifty = generateInstrumentId("NIFTY");
               const instrumentIdNifty = "NIFTY 50";
               if (Request.InstrumentIdentifier === instrumentIdNifty) {
-                dataTickListNifty.push(listItem);
+                if (Result.length > 0) {
+                  dataTickListNifty.push(listItem);
+                }
                 socketTickFlag.isNewTickNiftySnapshot = true;
                 socketTickFlag.isExpoTickFinalData = false;
-                // saveSnapshot(listItem, interval, product.NIFTY);
+                saveSnapshot(listItem, interval, product.NIFTY);
               } else {
-                dataTickListBankNifty.push(listItem);
+                if (Result.length > 0) {
+                  dataTickListBankNifty.push(listItem);
+                }
                 socketTickFlag.isNewTickBankNiftySnapshot = true;
                 socketTickFlag.isExpoTickFinalDataBankNifty = false;
-                // saveSnapshot(listItem, interval, product.BANKNIFTY);
+                saveSnapshot(listItem, interval, product.BANKNIFTY);
               }
             }
             // messages for history option symbol
@@ -530,20 +561,20 @@ module.exports = {
               };
               if (productTag === product.NIFTY) {
                 optionTickReqListNifty.push(listItem);
-                // saveOptionData(
-                //   listItem,
-                //   interval,
-                //   product.NIFTY,
-                //   Request.InstrumentIdentifier
-                // );
+                saveOptionData(
+                  listItem,
+                  interval,
+                  product.NIFTY,
+                  Request.InstrumentIdentifier
+                );
               } else {
                 optionTickReqListBankNifty.push(listItem);
-                // saveOptionData(
-                //   listItem,
-                //   interval,
-                //   product.BANKNIFTY,
-                //   Request.InstrumentIdentifier
-                // );
+                saveOptionData(
+                  listItem,
+                  interval,
+                  product.BANKNIFTY,
+                  Request.InstrumentIdentifier
+                );
               }
             }
           }
@@ -571,7 +602,6 @@ module.exports = {
         }
       }
     });
-
     // Todo uncomment and schedule handling
     const job = schedule.scheduleJob("globalSocket", rule, () => {
       const msg5 = "Global data instance initiated!, ";
