@@ -36,6 +36,8 @@ module.exports = {
       ) {
         let sumVolCall = 0;
         let sumVolPut = 0;
+        socketFlag.isOptionSumNiftyDone = true;
+
         // get the option items for current trade Time
         const filteredList = niftyList.filter(
           (item) => item.LastTradeTime === tradeTime
@@ -90,7 +92,6 @@ module.exports = {
             optionReqListNifty.splice(index, 1);
           }
         });
-        socketFlag.isOptionSumNiftyDone = true;
 
         //Todo generate exponential data for duration 15, 30, 45, 60
         generateExpoDataNifty(tradeTime, "15", wss);
@@ -100,7 +101,7 @@ module.exports = {
 
         clearInterval(niftyInterval);
       }
-    }, 300);
+    }, 100);
   },
 
   generateSumOfVolOptionListBankNifty: (tradeTime, wss) => {
@@ -114,6 +115,8 @@ module.exports = {
       ) {
         let sumVolCall = 0;
         let sumVolPut = 0;
+        socketFlag.isOptionSumBankNiftyDone = true;
+
         const filteredList = bankNiftyList.filter(
           (item) => item.LastTradeTime === tradeTime
         );
@@ -168,7 +171,6 @@ module.exports = {
           }
         });
 
-        socketFlag.isOptionSumBankNiftyDone = true;
 
         //Todo generate exponential data for duration 15, 30, 45, 60
         generateExpoDataBankNifty(tradeTime, "15", wss);
@@ -178,7 +180,7 @@ module.exports = {
 
         clearInterval(bankNiftyInterval);
       }
-    }, 300);
+    }, 100);
   },
 
   generateSumOfTickVolOptionListNifty: (tradeTime, wss) => {
@@ -193,6 +195,8 @@ module.exports = {
       ) {
         let sumVolCall = 0;
         let sumVolPut = 0;
+        socketTickFlag.isOptionTickSumNiftyDone = true;
+
         // get the option items for current trade Time
         const filteredList = niftyList.filter(
           (item) => item.LastTradeTime === tradeTime
@@ -248,7 +252,6 @@ module.exports = {
             optionTickReqListNifty.splice(index, 1);
           }
         });
-        socketTickFlag.isOptionTickSumNiftyDone = true;
 
         // generate exponential data for duration 15, 30, 45, 60
         generateExpoTickDataNifty(tradeTime, "15", wss);
@@ -258,7 +261,7 @@ module.exports = {
 
         clearInterval(niftyInterval);
       }
-    }, 300);
+    }, 100);
   },
 
   generateSumOfTickVolOptionListBankNifty: (tradeTime, wss) => {
@@ -272,6 +275,8 @@ module.exports = {
       ) {
         let sumVolCall = 0;
         let sumVolPut = 0;
+        socketFlag.isOptionTickSumBankNiftyDone = true;
+
         const filteredList = bankNiftyList.filter(
           (item) => item.LastTradeTime === tradeTime
           );
@@ -332,10 +337,9 @@ module.exports = {
           }
         });
 
-        socketFlag.isOptionTickSumBankNiftyDone = true;
         clearInterval(bankNiftyInterval);
       }
-    }, 300);
+    }, 100);
   },
   
 };

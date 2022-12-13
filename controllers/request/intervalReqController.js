@@ -54,7 +54,6 @@ module.exports = {
     //     "FutureHistory"
     //   );
     // }, 500);
-    // // // loop calls
     // socketInterval.minuteInterval = setInterval(() => {
     //   fromTime = fromTime + 60;
     //   GetFutureHistory(
@@ -64,16 +63,14 @@ module.exports = {
     //     fromTime,
     //     "FutureHistory"
     //   );
-    //   setTimeout(() => {
-    //     GetFutureHistory(
-    //       conn,
-    //       instrumentId2,
-    //       fromTime,
-    //       fromTime,
-    //       "FutureHistory"
-    //     );
-    //   }, 500);
-    // }, 8000); //
+    //   GetFutureHistory(
+    //     conn,
+    //     instrumentId2,
+    //     fromTime,
+    //     fromTime,
+    //     "FutureHistory"
+    //   );
+    // }, 60000); //
   },
 
   tickReqController: (conn, wss) => {
@@ -88,14 +85,15 @@ module.exports = {
     generateTickPipeline(conn, wss, product.NIFTY);
     generateTickPipeline(conn, wss, product.BANKNIFTY);
 
-    setInterval(() => {
-      // if new NIFTY snapshot has come
+    socketInterval.tickInterval = setInterval(() => {
       if (
         socketFlag.isNewNiftySnapshot === true &&
         socketTickFlag.isNewTickNiftySnapshot === true &&
-        !socketFlag.isSyncing
+        !socketFlag.isSyncing &&
+        !socketTickFlag.tickTimerDone
       ) {
         let tempInterval;
+        socketTickFlag.tickTimerDone = true;
         try {
           // loop calls
           const tickItems = [...dataTickListNifty];
@@ -111,22 +109,20 @@ module.exports = {
                 fromTime,
                 "FutureHistory"
               );
-              setTimeout(() => {
-                GetFutureTickHistory(
-                  conn,
-                  instrumentId2,
-                  fromTime,
-                  fromTime,
-                  "FutureHistory"
-                );
-              }, 500);
-            }, 1000);
-            clearInterval(tempInterval);
+              GetFutureTickHistory(
+                conn,
+                instrumentId2,
+                fromTime,
+                fromTime,
+                "FutureHistory"
+              );
+              clearInterval(tempInterval);
+            }, 500);
           }, 30000); // loop each 30 sec
         } catch (err) {
           console.log(err);
         }
       }
-    }, 100); // ticker interval to check if minute data has come;
+    }, 100);
   },
 };

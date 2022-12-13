@@ -67,6 +67,7 @@ module.exports = {
       // fetch all the data of volume and expo avg from database
       // min vol data
       const niftyData = await fetchLatestVolumeData(product.NIFTY, "60");
+      console.log(niftyData)
       const niftyList = await refactorFinalData(niftyData, "vol");
       optionVolListNifty.push(...niftyList);
       const bankData = await fetchLatestVolumeData(product.BANKNIFTY, "60");
@@ -119,8 +120,8 @@ module.exports = {
 
       // fetch all the data from global db one by one until the current timestamp minute
       if (
-        optionVolListNifty.length === 0 ||
-        optionTickVolListNifty.length === 0
+        optionVolListNifty.length !== 0 ||
+        optionTickVolListNifty.length !== 0
       ) {
         socketFlag.isSyncing = false;
         socketFlag.isNewNiftySnapshot = false;

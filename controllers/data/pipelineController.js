@@ -45,7 +45,7 @@ module.exports = {
             socketFlag.isOptionSumNiftyDone = false;
             generateSumOfVolOptionListNifty(tradeTime, wss);
           }
-        }, 300);
+        }, 500);
         break;
       case product.BANKNIFTY:
         // do something for banknifty
@@ -66,7 +66,7 @@ module.exports = {
             socketFlag.isOptionSumBankNiftyDone = false;
             generateSumOfVolOptionListBankNifty(tradeTime, wss);
           }
-        }, 300);
+        }, 500);
         break;
     }
   },
@@ -92,7 +92,7 @@ module.exports = {
             socketTickFlag.isOptionTickSumNiftyDone = false;
             generateSumOfTickVolOptionListNifty(tradeTime, wss);
           }
-        }, 300);
+        }, 500);
         break;
       case product.BANKNIFTY:
         // do something for banknifty
@@ -114,7 +114,7 @@ module.exports = {
             socketTickFlag.isOptionTickSumBankNiftyDone = false;
             generateSumOfTickVolOptionListBankNifty(tradeTime, wss);
           }
-        }, 300);
+        }, 500);
         break;
     }
   },

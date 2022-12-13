@@ -253,29 +253,19 @@ module.exports = {
           if (AuthConnect && !initialized) {
             initialized = true;
             console.log("controllers initiated!, ", moment().toDate());
-            const rule = new schedule.RecurrenceRule();
-            rule.tz = "Asia/Kolkata";
-            rule.dayOfWeek = [0, new schedule.Range(1, 5)];
-            rule.hour = 9;
-            rule.minute = 15;
-            rule.second = 1;
             let msg1 = "minute controller initiated successfully!";
             const msg2 = "tick controller initiated successfully!";
-            console.log(msg1);
             sendWSMessage(wsClient, msg1);
             sendWSMessage(wsClient, msg2);
             minuteReqController(connection, wsClient);
             tickReqController(connection, wsClient);
-            const reqJbo = schedule.scheduleJob("reqJob", rule, () => {
-              console.log(msg2);
-            });
           } else if (!AuthConnect || !initialized) {
             Authenticate();
           } else {
             clearInterval(tempInterval);
           }
         }, 5000); // check if user is authenticated after each 5 sec
-      }, 10000); // wait for 10 seconds
+      }, 30000); // wait for 30 seconds
 
       // Todo minute interval
       mainInterval = setInterval(() => {
@@ -293,24 +283,7 @@ module.exports = {
           console.log(msg3, moment().toDate());
           sendWSMessage(wsClient, msg3);
           // clear all the intervals
-          const {
-            niftyPipeInterval,
-            bankNiftyPipeInterval,
-            niftyTickPipeInterval,
-            bankNiftyTickPipeInterval,
-            tickInterval,
-            minuteInterval,
-            tickMsgInterval,
-            minuteMsgInterval,
-          } = socketInterval;
-          clearInterval(niftyPipeInterval);
-          clearInterval(bankNiftyPipeInterval);
-          clearInterval(niftyTickPipeInterval);
-          clearInterval(bankNiftyTickPipeInterval);
-          clearInterval(tickInterval);
-          clearInterval(minuteInterval);
-          clearInterval(tickMsgInterval);
-          clearInterval(minuteMsgInterval);
+          clearAllIntervals()
           clearInterval(mainInterval);
 
           // clear all the queues
@@ -338,6 +311,27 @@ module.exports = {
           }, 5000);
         }
       }, 3600000); // loop each hour
+
+      function clearAllIntervals() { 
+        const {
+          niftyPipeInterval,
+          bankNiftyPipeInterval,
+          niftyTickPipeInterval,
+          bankNiftyTickPipeInterval,
+          tickInterval,
+          minuteInterval,
+          tickMsgInterval,
+          minuteMsgInterval,
+        } = socketInterval;
+        clearInterval(niftyPipeInterval);
+        clearInterval(bankNiftyPipeInterval);
+        clearInterval(niftyTickPipeInterval);
+        clearInterval(bankNiftyTickPipeInterval);
+        clearInterval(tickInterval);
+        clearInterval(minuteInterval);
+        clearInterval(tickMsgInterval);
+        clearInterval(minuteMsgInterval);
+      }
 
       connection.on("error", function (error) {
         console.log("Connection Error: " + error.toString());
@@ -374,6 +368,7 @@ module.exports = {
             let fromTime = moment([year, month, date, 9, 14, 30, 00]).unix();
 
             if (data.LastTradeTime >= fromTime) {
+              socketTickFlag.tickTimerDone = false;
               if (data.InstrumentIdentifier === instrumentIdNifty) {
                 dataListNifty.push(data);
                 dataTickListNifty.push(data);
@@ -387,6 +382,7 @@ module.exports = {
                 socketTickFlag.isNewTickNiftySnapshot = true;
                 socketTickFlag.isExpoTickFinalData = false;
                 saveSnapshot(data, "30", product.NIFTY);
+
               } else {
                 dataListBankNifty.push(data);
                 dataTickListBankNifty.push(data);
@@ -423,6 +419,8 @@ module.exports = {
               let tickInterval = "30";
               // const instrumentIdNifty = generateInstrumentId("NIFTY");
               const instrumentIdNifty = "NIFTY 50";
+              socketTickFlag.tickTimerDone = false;
+
               if (Request.InstrumentIdentifier === instrumentIdNifty) {
                 if (Result.length > 0) {
                   dataListNifty.push(item);
@@ -506,11 +504,6 @@ module.exports = {
               if (Result.length > 0) {
                 listItem = Result[0];
               }
-              // if (Result.length === 0) {
-              //   clearInterval(socketInterval.syncInterval);
-              //   socketFlag.isSyncing = false;
-              //   console.log("Syncing has stopped!, ", moment().toDate());
-              // }
               socketTickFlag.isNewTickSnapshot = true;
               // const instrumentIdNifty = generateInstrumentId("NIFTY");
               const instrumentIdNifty = "NIFTY 50";
