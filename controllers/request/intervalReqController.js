@@ -29,48 +29,48 @@ module.exports = {
     const month = moment().month();
     const date = moment().date();
     const year = moment().year();
-    let fromTime = moment([year, month, date, 9, 15, 00, 00]).unix();
+    let fromTime = moment([year, month, 16, 9, 15, 00, 00]).unix();
 
     // create 2 pipeline for NIFTY(PE/CE) & BANKNIFTY(PE/CE)
     generatePipeline(conn, wss, product.NIFTY);
     generatePipeline(conn, wss, product.BANKNIFTY);
 
-    SubscribeSnapshot(conn, instrumentId1, false);
-    SubscribeSnapshot(conn, instrumentId2, false);
+    // SubscribeSnapshot(conn, instrumentId1, false);
+    // SubscribeSnapshot(conn, instrumentId2, false);
 
-    // setTimeout(() => {
-    //   GetFutureHistory(
-    //     conn,
-    //     instrumentId1,
-    //     fromTime,
-    //     fromTime,
-    //     "FutureHistory"
-    //   );
-    //   GetFutureHistory(
-    //     conn,
-    //     instrumentId2,
-    //     fromTime,
-    //     fromTime,
-    //     "FutureHistory"
-    //   );
-    // }, 500);
-    // socketInterval.minuteInterval = setInterval(() => {
-    //   fromTime = fromTime + 60;
-    //   GetFutureHistory(
-    //     conn,
-    //     instrumentId1,
-    //     fromTime,
-    //     fromTime,
-    //     "FutureHistory"
-    //   );
-    //   GetFutureHistory(
-    //     conn,
-    //     instrumentId2,
-    //     fromTime,
-    //     fromTime,
-    //     "FutureHistory"
-    //   );
-    // }, 60000); //
+    setTimeout(() => {
+      GetFutureHistory(
+        conn,
+        instrumentId1,
+        fromTime,
+        fromTime,
+        "FutureHistory"
+      );
+      GetFutureHistory(
+        conn,
+        instrumentId2,
+        fromTime,
+        fromTime,
+        "FutureHistory"
+      );
+    }, 500);
+    socketInterval.minuteInterval = setInterval(() => {
+      fromTime = fromTime + 60;
+      GetFutureHistory(
+        conn,
+        instrumentId1,
+        fromTime,
+        fromTime,
+        "FutureHistory"
+      );
+      GetFutureHistory(
+        conn,
+        instrumentId2,
+        fromTime,
+        fromTime,
+        "FutureHistory"
+      );
+    }, 60000); //
   },
 
   tickReqController: (conn, wss) => {
@@ -80,7 +80,7 @@ module.exports = {
     const month = moment().month();
     const date = moment().date();
     const year = moment().year();
-    let fromTime = moment([year, month, date, 9, 15, 00, 00]).unix();
+    let fromTime = moment([year, month, 16, 9, 15, 00, 00]).unix();
     // create 2 tick pipeline for NIFTY(PE/CE) & BANKN IFTY(PE/CE)
     generateTickPipeline(conn, wss, product.NIFTY);
     generateTickPipeline(conn, wss, product.BANKNIFTY);

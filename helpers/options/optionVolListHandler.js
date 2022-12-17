@@ -1,14 +1,20 @@
 const moment = require("moment");
 const option = require("../../constants/option");
 const product = require("../../constants/product");
-const { socketFlag, socketTickFlag, socketInterval } = require("../../constants/socketFlag");
+const {
+  socketFlag,
+  socketTickFlag,
+  socketInterval,
+} = require("../../constants/socketFlag");
 const {
   generateExpoDataNifty,
   generateExpoTickDataNifty,
   generateExpoDataBankNifty,
   generateExpoTickDataBankNifty,
 } = require("../../controllers/data/expoDataController");
-const { saveSumVolumeData } = require("../../controllers/database/sumVolController");
+const {
+  saveSumVolumeData,
+} = require("../../controllers/database/sumVolController");
 const {
   optionVolListNifty,
   optionVolListBankNifty,
@@ -62,7 +68,10 @@ module.exports = {
           sumVolPut = sumVolPut + vol;
         });
 
-        const {percentCE, percentPE} = calculatePercentWeight(sumVolCall, sumVolPut)
+        const { percentCE, percentPE } = calculatePercentWeight(
+          sumVolCall,
+          sumVolPut
+        );
 
         const listItem = {
           exchange: product.NIFTY,
@@ -70,17 +79,17 @@ module.exports = {
           dataType: "SumVolume",
           [option.CALL]: {
             Volume: parseFloat(sumVolCall),
-            PercentVolume: parseFloat(percentCE)
+            PercentVolume: parseFloat(percentCE),
           },
           [option.PUT]: {
             Volume: parseFloat(sumVolPut),
-            PercentVolume: parseFloat(percentPE)
+            PercentVolume: parseFloat(percentPE),
           },
           tradeTime,
           date: moment.unix(tradeTime).format("DD/MM/YYYY hh:mm:ss"),
         };
         optionVolListNifty.push(listItem);
-        sendWSMessage(wss, listItem)
+        sendWSMessage(wss, listItem);
 
         // save sum of volume to database
         saveSumVolumeData(listItem, "60", product.NIFTY);
@@ -140,7 +149,10 @@ module.exports = {
           sumVolPut = sumVolPut + vol;
         });
 
-        const {percentCE, percentPE} = calculatePercentWeight(sumVolCall, sumVolPut)
+        const { percentCE, percentPE } = calculatePercentWeight(
+          sumVolCall,
+          sumVolPut
+        );
 
         const listItem = {
           exchange: product.BANKNIFTY,
@@ -148,17 +160,17 @@ module.exports = {
           dataType: "SumVolume",
           [option.CALL]: {
             Volume: parseFloat(sumVolCall),
-            PercentVolume: parseFloat(percentCE)
+            PercentVolume: parseFloat(percentCE),
           },
           [option.PUT]: {
             Volume: parseFloat(sumVolPut),
-            PercentVolume: parseFloat(percentPE)
+            PercentVolume: parseFloat(percentPE),
           },
           tradeTime,
           date: moment.unix(tradeTime).format("DD/MM/YYYY hh:mm:ss"),
         };
         optionVolListBankNifty.push(listItem);
-        sendWSMessage(wss, listItem)
+        sendWSMessage(wss, listItem);
 
         // save sum of volume to database
         saveSumVolumeData(listItem, "60", product.BANKNIFTY);
@@ -170,7 +182,6 @@ module.exports = {
             optionReqListBankNifty.splice(index, 1);
           }
         });
-
 
         //Todo generate exponential data for duration 15, 30, 45, 60
         generateExpoDataBankNifty(tradeTime, "15", wss);
@@ -186,7 +197,7 @@ module.exports = {
   generateSumOfTickVolOptionListNifty: (tradeTime, wss) => {
     const niftyList = optionTickReqListNifty;
     let niftyInterval;
-    
+
     // set interval for nifty
     niftyInterval = setInterval(() => {
       if (
@@ -221,7 +232,10 @@ module.exports = {
           sumVolPut = sumVolPut + vol;
         });
 
-        const {percentCE, percentPE} = calculatePercentWeight(sumVolCall, sumVolPut)
+        const { percentCE, percentPE } = calculatePercentWeight(
+          sumVolCall,
+          sumVolPut
+        );
 
         const listItem = {
           exchange: product.NIFTY,
@@ -229,21 +243,21 @@ module.exports = {
           dataType: "SumVolume",
           [option.CALL]: {
             Volume: parseFloat(sumVolCall),
-            PercentVolume: parseFloat(percentCE)
+            PercentVolume: parseFloat(percentCE),
           },
           [option.PUT]: {
             Volume: parseFloat(sumVolPut),
-            PercentVolume: parseFloat(percentPE)
+            PercentVolume: parseFloat(percentPE),
           },
           tradeTime,
           date: moment.unix(tradeTime).format("DD/MM/YYYY hh:mm:ss"),
         };
         optionTickVolListNifty.push(listItem);
-        
+
         // save sum of volume to database
         saveSumVolumeData(listItem, "30", product.NIFTY);
-        
-        sendWSMessage(wss, listItem)
+
+        sendWSMessage(wss, listItem);
 
         // delete all the option items of current tradeTime
         filteredList.forEach((item) => {
@@ -279,7 +293,7 @@ module.exports = {
 
         const filteredList = bankNiftyList.filter(
           (item) => item.LastTradeTime === tradeTime
-          );
+        );
         const bankNiftyOptionList = filteredList.filter(
           (item) => item.Product === product.BANKNIFTY
         );
@@ -300,7 +314,10 @@ module.exports = {
           sumVolPut = sumVolPut + vol;
         });
 
-        const {percentCE, percentPE} = calculatePercentWeight(sumVolCall, sumVolPut)
+        const { percentCE, percentPE } = calculatePercentWeight(
+          sumVolCall,
+          sumVolPut
+        );
 
         const listItem = {
           exchange: product.BANKNIFTY,
@@ -308,26 +325,21 @@ module.exports = {
           dataType: "SumVolume",
           [option.CALL]: {
             Volume: parseFloat(sumVolCall),
-            PercentVolume: parseFloat(percentCE)
+            PercentVolume: parseFloat(percentCE),
           },
           [option.PUT]: {
             Volume: parseFloat(sumVolPut),
-            PercentVolume: parseFloat(percentPE)
+            PercentVolume: parseFloat(percentPE),
           },
           tradeTime,
           date: moment.unix(tradeTime).format("DD/MM/YYYY hh:mm:ss"),
         };
         optionTickVolListBankNifty.push(listItem);
-        sendWSMessage(wss, listItem)
-
-        // generate exponential data for duration 15, 30, 45, 60
-        generateExpoTickDataBankNifty(tradeTime, "15", wss);
-        generateExpoTickDataBankNifty(tradeTime, "30", wss);
-        generateExpoTickDataBankNifty(tradeTime, "45", wss);
-        generateExpoTickDataBankNifty(tradeTime, "60", wss);
 
         // save sum of volume to database
         saveSumVolumeData(listItem, "30", product.BANKNIFTY);
+
+        sendWSMessage(wss, listItem);
 
         // delete all the option items of current tradeTime
         filteredList.forEach((item) => {
@@ -337,24 +349,29 @@ module.exports = {
           }
         });
 
+        // generate exponential data for duration 15, 30, 45, 60
+        generateExpoTickDataBankNifty(tradeTime, "15", wss);
+        generateExpoTickDataBankNifty(tradeTime, "30", wss);
+        generateExpoTickDataBankNifty(tradeTime, "45", wss);
+        generateExpoTickDataBankNifty(tradeTime, "60", wss);
+
         clearInterval(bankNiftyInterval);
       }
     }, 100);
   },
-  
 };
 
 function calculatePercentWeight(sumVolCall, sumVolPut) {
   const sumCE = parseFloat(sumVolCall);
   const sumPE = parseFloat(sumVolPut);
-  const total = parseFloat(parseFloat(sumCE) + parseFloat(sumPE))
-  const avgCE = parseFloat(parseFloat(sumCE)/parseFloat(total))
-  const avgPE = parseFloat(parseFloat(sumPE)/parseFloat(total))
-  const percentCE = parseFloat(avgCE * sumCE).toFixed(2)
-  const percentPE = parseFloat(avgPE * sumPE).toFixed(2)
+  const total = parseFloat(parseFloat(sumCE) + parseFloat(sumPE));
+  const avgCE = parseFloat(parseFloat(sumCE) / parseFloat(total));
+  const avgPE = parseFloat(parseFloat(sumPE) / parseFloat(total));
+  const percentCE = parseFloat(avgCE * sumCE).toFixed(2);
+  const percentPE = parseFloat(avgPE * sumPE).toFixed(2);
   const listItem = {
     percentCE: isNaN(percentCE) ? 0 : parseFloat(percentCE),
-    percentPE: isNaN(percentPE) ? 0: parseFloat(percentPE)
-  }
+    percentPE: isNaN(percentPE) ? 0 : parseFloat(percentPE),
+  };
   return listItem;
 }

@@ -92,15 +92,15 @@ module.exports = {
               );
             }
             if (requestType === "Connect") {
-              conn.close()
+              conn.close();
               const msg4 = "Global data instance has stopped!";
               console.log(msg4, moment().toDate());
               setTimeout(() => {
                 client.connect(endpoint);
-              }, 3000) // connect after 3 seconds
+              }, 3000); // connect after 3 seconds
             }
-            if(requestType === "Sync") {
-              syncControllers(conn)
+            if (requestType === "Sync") {
+              syncControllers(conn);
             }
             if (requestType === types.GetMinuteData) {
               // send first chunk of data
@@ -273,20 +273,42 @@ module.exports = {
         const currentTime = moment().unix(); // 330 hours for 5:30 GMT offset
         const closeTime = moment()
           .set("hour", 23)
-          .set("minute", 00)
+          .set("minute", 30)
           .set("second", 00);
         // closing time is 11:00 pm of each day
         const closeTimestamp = closeTime.unix();
+
+        const globalDataEndTime = moment()
+          .set("hour", 15)
+          .set("minute", 30)
+          .unix();
+          // Todo remove comment
+        // if (currentTime > globalDataEndTime) {
+        //   // close the global data feed connection
+        //   setTimeout(() => {
+        //     doClose();
+        //   }, 5000);
+        // }
+
         if (currentTime > closeTimestamp) {
           // close the socket
           const msg3 = "Global data instance is stopping!";
           console.log(msg3, moment().toDate());
           sendWSMessage(wsClient, msg3);
           // clear all the intervals
-          clearAllIntervals()
-          clearInterval(mainInterval);
+          clearAllIntervals();
 
           // clear all the queues
+          dataListNifty.splice(0, dataListNifty.length)
+          dataListBankNifty.splice(0, dataListBankNifty.length)
+          dataTickListNifty.splice(0, dataTickListNifty.length)
+          dataTickListBankNifty.splice(0, dataTickListBankNifty.length)
+
+          optionReqListNifty.splice(0, optionReqListNifty.length);
+          optionReqListBankNifty.splice(0, optionReqListBankNifty.length);
+          optionTickReqListNifty.splice(0, optionTickReqListNifty.length);
+          optionTickReqListBankNifty.splice(0, optionTickReqListBankNifty.length);
+
           optionVolListNifty.splice(0, optionVolListNifty.length);
           optionVolListBankNifty.splice(0, optionVolListBankNifty.length);
           optionTickVolListNifty.splice(0, optionTickVolListNifty.length);
@@ -305,14 +327,13 @@ module.exports = {
             );
           });
 
-          // close the global data feed connection
           setTimeout(() => {
-            doClose();
+            clearInterval(mainInterval);
           }, 5000);
         }
-      }, 3600000); // loop each hour
+      }, 60000); // loop each minute
 
-      function clearAllIntervals() { 
+      function clearAllIntervals() {
         const {
           niftyPipeInterval,
           bankNiftyPipeInterval,
@@ -365,7 +386,7 @@ module.exports = {
             const month = moment().month();
             const date = moment().date();
             const year = moment().year();
-            let fromTime = moment([year, month, date, 9, 14, 30, 00]).unix();
+            let fromTime = moment([year, month, date, 9, 15, 00, 00]).unix();
 
             if (data.LastTradeTime >= fromTime) {
               socketTickFlag.tickTimerDone = false;
@@ -382,7 +403,6 @@ module.exports = {
                 socketTickFlag.isNewTickNiftySnapshot = true;
                 socketTickFlag.isExpoTickFinalData = false;
                 saveSnapshot(data, "30", product.NIFTY);
-
               } else {
                 dataListBankNifty.push(data);
                 dataTickListBankNifty.push(data);
@@ -600,7 +620,7 @@ module.exports = {
       const msg5 = "Global data instance initiated!, ";
       console.log(msg5, moment().toDate());
       sendWSMessage(wsClient, msg5);
-      client.connect(endpoint);
     });
+    client.connect(endpoint);
   },
 };
