@@ -273,7 +273,7 @@ module.exports = {
         const currentTime = moment().unix(); // 330 hours for 5:30 GMT offset
         const closeTime = moment()
           .set("hour", 23)
-          .set("minute", 30)
+          .set("minute", 00)
           .set("second", 00);
         // closing time is 11:00 pm of each day
         const closeTimestamp = closeTime.unix();
@@ -282,13 +282,12 @@ module.exports = {
           .set("hour", 15)
           .set("minute", 30)
           .unix();
-          // Todo remove comment
-        // if (currentTime > globalDataEndTime) {
-        //   // close the global data feed connection
-        //   setTimeout(() => {
-        //     doClose();
-        //   }, 5000);
-        // }
+        if (currentTime > globalDataEndTime) {
+          // close the global data feed connection
+          setTimeout(() => {
+            doClose();
+          }, 5000);
+        }
 
         if (currentTime > closeTimestamp) {
           // close the socket
@@ -620,7 +619,7 @@ module.exports = {
       const msg5 = "Global data instance initiated!, ";
       console.log(msg5, moment().toDate());
       sendWSMessage(wsClient, msg5);
+      client.connect(endpoint);
     });
-    client.connect(endpoint);
   },
 };
