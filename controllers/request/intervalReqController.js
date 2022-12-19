@@ -75,7 +75,7 @@ module.exports = {
           fromTime,
           "FutureHistory"
         );
-      }, 15000); // wait for 60 sec
+      }, 60000); // wait for 60 sec
     }, 2000); // wait until pipeline generated
   },
 
@@ -133,7 +133,7 @@ module.exports = {
               "FutureHistory"
             );
             clearInterval(tempInterval);
-          }, 7500); // loop each 30 sec
+          }, 30000); // loop each 30 sec
         } catch (err) {
           console.log(err);
         }

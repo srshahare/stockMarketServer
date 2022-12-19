@@ -371,7 +371,7 @@ module.exports = {
           if (data.MessageType !== "Echo") {
             wsClient.clients.forEach((ws) => {
               if (ws.isAlive) {
-                ws.send(JSON.stringify(data));
+                // ws.send(JSON.stringify(data));
               }
             });
           }
