@@ -38,45 +38,45 @@ module.exports = {
     generatePipeline(conn, wss, product.NIFTY);
     generatePipeline(conn, wss, product.BANKNIFTY);
 
-    // SubscribeSnapshot(conn, instrumentId1, false);
-    // SubscribeSnapshot(conn, instrumentId2, false);
+    SubscribeSnapshot(conn, instrumentId1, false);
+    SubscribeSnapshot(conn, instrumentId2, false);
 
-    console.log("Minute Call, ", moment(fromTime).toDate());
-    setTimeout(() => {
-      GetFutureHistory(
-        conn,
-        instrumentId1,
-        fromTime,
-        fromTime,
-        "FutureHistory"
-      );
-      GetFutureHistory(
-        conn,
-        instrumentId2,
-        fromTime,
-        fromTime,
-        "FutureHistory"
-      );
+    // console.log("Minute Call, ", moment(fromTime).toDate());
+    // setTimeout(() => {
+    //   GetFutureHistory(
+    //     conn,
+    //     instrumentId1,
+    //     fromTime,
+    //     fromTime,
+    //     "FutureHistory"
+    //   );
+    //   GetFutureHistory(
+    //     conn,
+    //     instrumentId2,
+    //     fromTime,
+    //     fromTime,
+    //     "FutureHistory"
+    //   );
 
-      socketInterval.minuteInterval = setInterval(() => {
-        fromTime = fromTime + 60;
-        console.log("Minute Call, ", moment(fromTime).toDate());
-        GetFutureHistory(
-          conn,
-          instrumentId1,
-          fromTime,
-          fromTime,
-          "FutureHistory"
-        );
-        GetFutureHistory(
-          conn,
-          instrumentId2,
-          fromTime,
-          fromTime,
-          "FutureHistory"
-        );
-      }, 60000); // wait for 60 sec
-    }, 2000); // wait until pipeline generated
+    //   socketInterval.minuteInterval = setInterval(() => {
+    //     fromTime = fromTime + 60;
+    //     console.log("Minute Call, ", moment(fromTime).toDate());
+    //     GetFutureHistory(
+    //       conn,
+    //       instrumentId1,
+    //       fromTime,
+    //       fromTime,
+    //       "FutureHistory"
+    //     );
+    //     GetFutureHistory(
+    //       conn,
+    //       instrumentId2,
+    //       fromTime,
+    //       fromTime,
+    //       "FutureHistory"
+    //     );
+    //   }, 60000); // wait for 60 sec
+    // }, 2000); // wait until pipeline generated
   },
 
   tickReqController: (conn, wss) => {

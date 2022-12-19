@@ -265,7 +265,7 @@ module.exports = {
             clearInterval(tempInterval);
           }
         }, 5000); // check if user is authenticated after each 5 sec
-      }, 10000); // wait for 30 seconds
+      }, 30000); // wait for 30 seconds
 
       // Todo minute interval
       mainInterval = setInterval(() => {
@@ -282,12 +282,12 @@ module.exports = {
           .set("hour", 15)
           .set("minute", 30)
           .unix();
-        // if (currentTime > globalDataEndTime) {
-        //   // close the global data feed connection
-        //   setTimeout(() => {
-        //     doClose();
-        //   }, 5000);
-        // }
+        if (currentTime > globalDataEndTime) {
+          // close the global data feed connection
+          setTimeout(() => {
+            doClose();
+          }, 5000);
+        }
 
         if (currentTime > closeTimestamp) {
           // close the socket
@@ -620,7 +620,7 @@ module.exports = {
       const msg5 = "Global data instance initiated!, ";
       console.log(msg5, moment().toDate());
       sendWSMessage(wsClient, msg5);
+      client.connect(endpoint);
     });
-    client.connect(endpoint);
   },
 };
