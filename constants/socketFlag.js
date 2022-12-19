@@ -25,7 +25,9 @@ module.exports = {
     isExpoTickFinalData: false,
     isExpoTickFinalDataBankNifty: false,
 
-    tickTimerDone: false
+    tickTimerDone: false,
+    tickCheckNifty: false,
+    tickCheckBank: false
   },
   socketInterval: {
     niftyPipeInterval: null,

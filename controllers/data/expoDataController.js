@@ -33,13 +33,13 @@ module.exports = {
       pushExpoItem(listItem, intervalDuration, product.NIFTY);
       socketFlag.isExpoFinalDataNifty = true;
       // save expo avg data to db
-      saveExpoAvgData(
-        listItem,
-        "60",
-        intervalDuration,
-        product.NIFTY,
-        chart.STANDARD
-      );
+      // saveExpoAvgData(
+      //   listItem,
+      //   "60",
+      //   intervalDuration,
+      //   product.NIFTY,
+      //   chart.STANDARD
+      // );
       sendWSMessage(wss, listItem);
     } else if (optionVolListNifty.length > intervalDuration) {
       const tempVolListNifty = [...optionVolListNifty];
@@ -60,13 +60,13 @@ module.exports = {
       pushExpoItem(listItem, intervalDuration, product.NIFTY);
       socketFlag.isExpoFinalDataNifty = true;
       // save expo avg data to db
-      saveExpoAvgData(
-        listItem,
-        "60",
-        intervalDuration,
-        product.NIFTY,
-        chart.STANDARD
-      );
+      // saveExpoAvgData(
+      //   listItem,
+      //   "60",
+      //   intervalDuration,
+      //   product.NIFTY,
+      //   chart.STANDARD
+      // );
       sendWSMessage(wss, listItem);
     }
   },
@@ -84,13 +84,13 @@ module.exports = {
       pushExpoItem(listItem, intervalDuration, product.BANKNIFTY);
       socketFlag.isExpoFinalDataBankNifty = true;
       // save expo avg data to db
-      saveExpoAvgData(
-        listItem,
-        "60",
-        intervalDuration,
-        product.BANKNIFTY,
-        chart.STANDARD
-      );
+      // saveExpoAvgData(
+      //   listItem,
+      //   "60",
+      //   intervalDuration,
+      //   product.BANKNIFTY,
+      //   chart.STANDARD
+      // );
       sendWSMessage(wss, listItem);
     } else if (optionVolListBankNifty.length > intervalDuration) {
       const tempVolListBankNifty = [...optionVolListBankNifty];
@@ -111,13 +111,13 @@ module.exports = {
       pushExpoItem(listItem, intervalDuration, product.BANKNIFTY);
       socketFlag.isExpoFinalDataBankNifty = true;
       // save expo avg data to db
-      saveExpoAvgData(
-        listItem,
-        "60",
-        intervalDuration,
-        product.BANKNIFTY,
-        chart.STANDARD
-      );
+      // saveExpoAvgData(
+      //   listItem,
+      //   "60",
+      //   intervalDuration,
+      //   product.BANKNIFTY,
+      //   chart.STANDARD
+      // );
       sendWSMessage(wss, listItem);
     }
   },
@@ -135,13 +135,13 @@ module.exports = {
       pushTickExpoItem(listItem, intervalDuration, product.NIFTY);
       socketTickFlag.isExpoTickFinalData = true;
       // save expo avg data to db
-      saveExpoAvgData(
-        listItem,
-        "30",
-        parseInt(intervalDuration),
-        product.NIFTY,
-        chart.STANDARD
-      );
+      // saveExpoAvgData(
+      //   listItem,
+      //   "30",
+      //   parseInt(intervalDuration),
+      //   product.NIFTY,
+      //   chart.STANDARD
+      // );
       sendWSMessage(wss, listItem);
     } else if (optionTickVolListNifty.length > intervalDuration) {
       const tempVolListNifty = [...optionTickVolListNifty];
@@ -162,13 +162,13 @@ module.exports = {
       pushTickExpoItem(listItem, intervalDuration, product.NIFTY);
       socketTickFlag.isExpoTickFinalData = true;
       // save expo avg data to db
-      saveExpoAvgData(
-        listItem,
-        "30",
-        parseInt(intervalDuration),
-        product.NIFTY,
-        chart.STANDARD
-      );
+      // saveExpoAvgData(
+      //   listItem,
+      //   "30",
+      //   parseInt(intervalDuration),
+      //   product.NIFTY,
+      //   chart.STANDARD
+      // );
       sendWSMessage(wss, listItem);
     }
   },
@@ -186,13 +186,13 @@ module.exports = {
       pushTickExpoItem(listItem, intervalDuration, product.BANKNIFTY);
       socketTickFlag.isExpoTickFinalDataBankNifty = true;
       // save expo avg data to db
-      saveExpoAvgData(
-        listItem,
-        "30",
-        parseInt(intervalDuration),
-        product.BANKNIFTY,
-        chart.STANDARD
-      );
+      // saveExpoAvgData(
+      //   listItem,
+      //   "30",
+      //   parseInt(intervalDuration),
+      //   product.BANKNIFTY,
+      //   chart.STANDARD
+      // );
       sendWSMessage(wss, listItem);
     } else if (optionTickVolListBankNifty.length > intervalDuration) {
       const tempVolListBankNifty = [...optionTickVolListBankNifty];
@@ -213,13 +213,13 @@ module.exports = {
       pushTickExpoItem(listItem, intervalDuration, product.BANKNIFTY);
       socketTickFlag.isExpoTickFinalDataBankNifty = true;
       // save expo avg data to db
-      saveExpoAvgData(
-        listItem,
-        "30",
-        parseInt(intervalDuration),
-        product.BANKNIFTY,
-        chart.STANDARD
-      );
+      // saveExpoAvgData(
+      //   listItem,
+      //   "30",
+      //   parseInt(intervalDuration),
+      //   product.BANKNIFTY,
+      //   chart.STANDARD
+      // );
       sendWSMessage(wss, listItem);
     }
   },

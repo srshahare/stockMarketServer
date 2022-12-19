@@ -92,7 +92,7 @@ module.exports = {
         sendWSMessage(wss, listItem);
 
         // save sum of volume to database
-        saveSumVolumeData(listItem, "60", product.NIFTY);
+        // saveSumVolumeData(listItem, "60", product.NIFTY);
 
         // delete all the option items of current tradeTime
         filteredList.forEach((item) => {
@@ -173,7 +173,7 @@ module.exports = {
         sendWSMessage(wss, listItem);
 
         // save sum of volume to database
-        saveSumVolumeData(listItem, "60", product.BANKNIFTY);
+        // saveSumVolumeData(listItem, "60", product.BANKNIFTY);
 
         // delete all the option items of current tradeTime
         filteredList.forEach((item) => {
@@ -255,7 +255,7 @@ module.exports = {
         optionTickVolListNifty.push(listItem);
 
         // save sum of volume to database
-        saveSumVolumeData(listItem, "30", product.NIFTY);
+        // saveSumVolumeData(listItem, "30", product.NIFTY);
 
         sendWSMessage(wss, listItem);
 
@@ -337,7 +337,7 @@ module.exports = {
         optionTickVolListBankNifty.push(listItem);
 
         // save sum of volume to database
-        saveSumVolumeData(listItem, "30", product.BANKNIFTY);
+        // saveSumVolumeData(listItem, "30", product.BANKNIFTY);
 
         sendWSMessage(wss, listItem);
 

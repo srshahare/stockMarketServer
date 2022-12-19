@@ -257,15 +257,15 @@ module.exports = {
             const msg2 = "tick controller initiated successfully!";
             sendWSMessage(wsClient, msg1);
             sendWSMessage(wsClient, msg2);
-            minuteReqController(connection, wsClient);
             tickReqController(connection, wsClient);
+            minuteReqController(connection, wsClient);
           } else if (!AuthConnect || !initialized) {
             Authenticate();
           } else {
             clearInterval(tempInterval);
           }
         }, 5000); // check if user is authenticated after each 5 sec
-      }, 30000); // wait for 30 seconds
+      }, 10000); // wait for 30 seconds
 
       // Todo minute interval
       mainInterval = setInterval(() => {
@@ -282,12 +282,12 @@ module.exports = {
           .set("hour", 15)
           .set("minute", 30)
           .unix();
-        if (currentTime > globalDataEndTime) {
-          // close the global data feed connection
-          setTimeout(() => {
-            doClose();
-          }, 5000);
-        }
+        // if (currentTime > globalDataEndTime) {
+        //   // close the global data feed connection
+        //   setTimeout(() => {
+        //     doClose();
+        //   }, 5000);
+        // }
 
         if (currentTime > closeTimestamp) {
           // close the socket
@@ -371,7 +371,7 @@ module.exports = {
           if (data.MessageType !== "Echo") {
             wsClient.clients.forEach((ws) => {
               if (ws.isAlive) {
-                // ws.send(JSON.stringify(data));
+                ws.send(JSON.stringify(data));
               }
             });
           }
@@ -396,12 +396,12 @@ module.exports = {
                 // for min data
                 socketFlag.isNewNiftySnapshot = true;
                 socketFlag.isExpoFinalDataNifty = false;
-                saveSnapshot(data, "60", product.NIFTY);
+                // saveSnapshot(data, "60", product.NIFTY);
 
                 // for tick data
                 socketTickFlag.isNewTickNiftySnapshot = true;
                 socketTickFlag.isExpoTickFinalData = false;
-                saveSnapshot(data, "30", product.NIFTY);
+                // saveSnapshot(data, "30", product.NIFTY);
               } else {
                 dataListBankNifty.push(data);
                 dataTickListBankNifty.push(data);
@@ -409,12 +409,12 @@ module.exports = {
                 // for min data
                 socketFlag.isNewBankNiftySnapshot = true;
                 socketFlag.isExpoFinalDataBankNifty = false;
-                saveSnapshot(data, "60", product.BANKNIFTY);
+                // saveSnapshot(data, "60", product.BANKNIFTY);
 
                 // for tick data
                 socketTickFlag.isNewTickBankNiftySnapshot = true;
                 socketTickFlag.isExpoTickFinalDataBankNifty = false;
-                saveSnapshot(data, "30", product.BANKNIFTY);
+                // saveSnapshot(data, "30", product.BANKNIFTY);
               }
             }
           }
@@ -448,12 +448,12 @@ module.exports = {
                 // for min data
                 socketFlag.isNewNiftySnapshot = true;
                 socketFlag.isExpoFinalDataNifty = false;
-                saveSnapshot(item, interval, product.NIFTY);
+                // saveSnapshot(item, interval, product.NIFTY);
 
                 // for tick data
                 socketTickFlag.isNewTickNiftySnapshot = true;
                 socketTickFlag.isExpoTickFinalData = false;
-                saveSnapshot(item, tickInterval, product.NIFTY);
+                // saveSnapshot(item, tickInterval, product.NIFTY);
               } else {
                 if (Result.length > 0) {
                   dataListBankNifty.push(item);
@@ -462,12 +462,12 @@ module.exports = {
                 // for min data
                 socketFlag.isNewBankNiftySnapshot = true;
                 socketFlag.isExpoFinalDataBankNifty = false;
-                saveSnapshot(item, interval, product.BANKNIFTY);
+                // saveSnapshot(item, interval, product.BANKNIFTY);
 
                 // for tick data
                 socketTickFlag.isNewTickBankNiftySnapshot = true;
                 socketTickFlag.isExpoTickFinalDataBankNifty = false;
-                saveSnapshot(item, tickInterval, product.BANKNIFTY);
+                // saveSnapshot(item, tickInterval, product.BANKNIFTY);
               }
             } else {
               const userTag = String(Request.UserTag).split("_");
@@ -489,21 +489,21 @@ module.exports = {
               if (productTag === product.NIFTY) {
                 optionReqListNifty.push(listItem);
                 // save nifty option data to database
-                saveOptionData(
-                  listItem,
-                  interval,
-                  product.NIFTY,
-                  Request.InstrumentIdentifier
-                );
+                // saveOptionData(
+                //   listItem,
+                //   interval,
+                //   product.NIFTY,
+                //   Request.InstrumentIdentifier
+                // );
               } else {
                 optionReqListBankNifty.push(listItem);
                 // save banknifty option data to database
-                saveOptionData(
-                  listItem,
-                  interval,
-                  product.BANKNIFTY,
-                  Request.InstrumentIdentifier
-                );
+                // saveOptionData(
+                //   listItem,
+                //   interval,
+                //   product.BANKNIFTY,
+                //   Request.InstrumentIdentifier
+                // );
               }
             }
           }
@@ -524,6 +524,7 @@ module.exports = {
                 listItem = Result[0];
               }
               socketTickFlag.isNewTickSnapshot = true;
+              
               // const instrumentIdNifty = generateInstrumentId("NIFTY");
               const instrumentIdNifty = "NIFTY 50";
               if (Request.InstrumentIdentifier === instrumentIdNifty) {
@@ -532,14 +533,14 @@ module.exports = {
                 }
                 socketTickFlag.isNewTickNiftySnapshot = true;
                 socketTickFlag.isExpoTickFinalData = false;
-                saveSnapshot(listItem, interval, product.NIFTY);
+                // saveSnapshot(listItem, interval, product.NIFTY);
               } else {
                 if (Result.length > 0) {
                   dataTickListBankNifty.push(listItem);
                 }
                 socketTickFlag.isNewTickBankNiftySnapshot = true;
                 socketTickFlag.isExpoTickFinalDataBankNifty = false;
-                saveSnapshot(listItem, interval, product.BANKNIFTY);
+                // saveSnapshot(listItem, interval, product.BANKNIFTY);
               }
             }
             // messages for history option symbol
@@ -573,20 +574,20 @@ module.exports = {
               };
               if (productTag === product.NIFTY) {
                 optionTickReqListNifty.push(listItem);
-                saveOptionData(
-                  listItem,
-                  interval,
-                  product.NIFTY,
-                  Request.InstrumentIdentifier
-                );
+                // saveOptionData(
+                //   listItem,
+                //   interval,
+                //   product.NIFTY,
+                //   Request.InstrumentIdentifier
+                // );
               } else {
                 optionTickReqListBankNifty.push(listItem);
-                saveOptionData(
-                  listItem,
-                  interval,
-                  product.BANKNIFTY,
-                  Request.InstrumentIdentifier
-                );
+                // saveOptionData(
+                //   listItem,
+                //   interval,
+                //   product.BANKNIFTY,
+                //   Request.InstrumentIdentifier
+                // );
               }
             }
           }
@@ -619,7 +620,7 @@ module.exports = {
       const msg5 = "Global data instance initiated!, ";
       console.log(msg5, moment().toDate());
       sendWSMessage(wsClient, msg5);
-      client.connect(endpoint);
     });
+    client.connect(endpoint);
   },
 };

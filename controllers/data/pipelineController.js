@@ -1,5 +1,9 @@
 const product = require("../../constants/product");
-const { socketFlag, socketTickFlag, socketInterval } = require("../../constants/socketFlag");
+const {
+  socketFlag,
+  socketTickFlag,
+  socketInterval,
+} = require("../../constants/socketFlag");
 const {
   generateOptionSymbolsNifty,
   generateOptionSymbolsBankNifty,
@@ -33,7 +37,8 @@ module.exports = {
         //*: stop the interval when the market is closed
         socketInterval.niftyPipeInterval = setInterval(async () => {
           // new data has arrived and queue of NIFTY is not empty
-          if (socketFlag.isNewNiftySnapshot && dataListNifty.length !== 0) {
+          if (socketFlag.isNewNiftySnapshot && dataListNifty.length !== 0 && socketTickFlag.tickTimerDone) {
+            console.log("Nifty Option")
             socketFlag.isNewNiftySnapshot = false;
             // no need to wait for that function (instant execution)
             const data = generateOptionSymbolsNifty(false);
@@ -52,8 +57,9 @@ module.exports = {
         socketInterval.bankNiftyPipeInterval = setInterval(() => {
           if (
             socketFlag.isNewBankNiftySnapshot &&
-            dataListBankNifty.length !== 0
+            dataListBankNifty.length !== 0 && socketTickFlag.tickTimerDone
           ) {
+            console.log("Bank Option")
             socketFlag.isNewBankNiftySnapshot = false;
             // no need to wait for that function (instant execution)
             const data = generateOptionSymbolsBankNifty(false);
@@ -78,16 +84,25 @@ module.exports = {
           // new data has arrived and queue of NIFTY is not empty
           if (
             socketTickFlag.isNewTickNiftySnapshot &&
-            dataTickListNifty.length !== 0
+            dataTickListNifty.length !== 0 && socketTickFlag.tickCheckNifty
           ) {
+            console.log("Tick Nifty Option")
             socketTickFlag.isNewTickNiftySnapshot = false;
+            socketTickFlag.tickCheckNifty = false;
             // no need to wait for that function (instant execution)
             // true is option is of 30 sec tick interval
             const data = generateOptionSymbolsNifty(true);
             const { tradeTime } = data;
             // async function (takes time to get the 4 data points from global data feed)
             socketTickFlag.isOptionTickNiftyFetched = false;
-            optionTickRequestNifty(conn, data);
+            if (socketFlag.isNewNiftySnapshot) {
+              // min and tick data came simultaneously wait for tick option
+              setTimeout(() => {
+                optionTickRequestNifty(conn, data);
+              }, 1500);
+            } else {
+              optionTickRequestNifty(conn, data);
+            }
 
             socketTickFlag.isOptionTickSumNiftyDone = false;
             generateSumOfTickVolOptionListNifty(tradeTime, wss);
@@ -99,9 +114,11 @@ module.exports = {
         socketInterval.bankNiftyTickPipeInterval = setInterval(() => {
           if (
             socketTickFlag.isNewTickBankNiftySnapshot &&
-            dataTickListBankNifty.length !== 0
+            dataTickListBankNifty.length !== 0 && socketTickFlag.tickCheckBank
           ) {
+            console.log("Tick Bank Option")
             socketTickFlag.isNewTickBankNiftySnapshot = false;
+            socketTickFlag.tickCheckBank = false;
             // no need to wait for that function (instant execution)
             // true is option is of 30 sec tick interval
             const data = generateOptionSymbolsBankNifty(true);
@@ -109,7 +126,15 @@ module.exports = {
 
             // async function (takes time to get the 4 data points from global data feed)
             socketTickFlag.isOptionTickBankNiftyFetched = false;
-            optionTickRequestBankNifty(conn, data);
+            if (socketFlag.isNewBankNiftySnapshot) {
+              // min and tick data came simultaneously wait for tick option
+
+              setTimeout(() => {
+                optionTickRequestBankNifty(conn, data);
+              }, 1500);
+            } else {
+              optionTickRequestBankNifty(conn, data);
+            }
 
             socketTickFlag.isOptionTickSumBankNiftyDone = false;
             generateSumOfTickVolOptionListBankNifty(tradeTime, wss);
