@@ -286,6 +286,7 @@ module.exports = {
           // close the global data feed connection
           setTimeout(() => {
             doClose();
+            clearAllIntervals();
           }, 5000);
         }
 
@@ -295,7 +296,6 @@ module.exports = {
           console.log(msg3, moment().toDate());
           sendWSMessage(wsClient, msg3);
           // clear all the intervals
-          clearAllIntervals();
 
           // clear all the queues
           dataListNifty.splice(0, dataListNifty.length)
@@ -620,7 +620,7 @@ module.exports = {
       const msg5 = "Global data instance initiated!, ";
       console.log(msg5, moment().toDate());
       sendWSMessage(wsClient, msg5);
-      client.connect(endpoint);
     });
+    client.connect(endpoint);
   },
 };
