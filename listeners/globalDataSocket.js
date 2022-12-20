@@ -325,10 +325,6 @@ module.exports = {
               finalTicklListBankNifty[dur].length
             );
           });
-
-          setTimeout(() => {
-            clearInterval(mainInterval);
-          }, 5000);
         }
       }, 60000); // loop each minute
 
@@ -620,7 +616,7 @@ module.exports = {
       const msg5 = "Global data instance initiated!, ";
       console.log(msg5, moment().toDate());
       sendWSMessage(wsClient, msg5);
+      client.connect(endpoint);
     });
-    client.connect(endpoint);
   },
 };
