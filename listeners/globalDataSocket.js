@@ -51,7 +51,8 @@ module.exports = {
     rule.tz = "Asia/Kolkata";
     rule.dayOfWeek = [0, new schedule.Range(1, 5)];
     rule.hour = 9;
-    rule.minute = 14;
+    rule.minute = 19;
+    rule.second = 30;
 
     client.on("connectFailed", function (error) {
       console.log(error);
@@ -252,31 +253,30 @@ module.exports = {
         tempInterval = setInterval(() => {
           if (AuthConnect && !initialized) {
             initialized = true;
-            console.log("controllers initiated!, ", moment().toDate());
-            let msg1 = "minute controller initiated successfully!";
-            const msg2 = "tick controller initiated successfully!";
-            sendWSMessage(wsClient, msg1);
-            sendWSMessage(wsClient, msg2);
-            tickReqController(connection, wsClient);
-            minuteReqController(connection, wsClient);
+            // clear all queues before initializing
+            clearAllQueues();
+            setTimeout(() => {
+              console.log("controllers initiated!, ", moment().toDate());
+              let msg1 = "minute controller initiated successfully!";
+              const msg2 = "tick controller initiated successfully!";
+              sendWSMessage(wsClient, msg1);
+              sendWSMessage(wsClient, msg2);
+              tickReqController(connection, wsClient);
+              minuteReqController(connection, wsClient);
+              clearInterval(tempInterval);
+            }, 2000);
           } else if (!AuthConnect || !initialized) {
             Authenticate();
           } else {
             clearInterval(tempInterval);
           }
         }, 5000); // check if user is authenticated after each 5 sec
-      }, 50000); // wait for 50 seconds
+      }, 20000); // wait for 20 seconds
 
       // Todo minute interval
       mainInterval = setInterval(() => {
         moment.tz.setDefault("Asia/Kolkata");
         const currentTime = moment().unix(); // 330 hours for 5:30 GMT offset
-        const closeTime = moment()
-          .set("hour", 23)
-          .set("minute", 00)
-          .set("second", 00);
-        // closing time is 11:00 pm of each day
-        const closeTimestamp = closeTime.unix();
 
         const globalDataEndTime = moment()
           .set("hour", 15)
@@ -288,43 +288,6 @@ module.exports = {
             doClose();
             clearAllIntervals();
           }, 5000);
-        }
-
-        if (currentTime > closeTimestamp) {
-          // close the socket
-          const msg3 = "Global data instance is stopping!";
-          console.log(msg3, moment().toDate());
-          sendWSMessage(wsClient, msg3);
-          // clear all the intervals
-
-          // clear all the queues
-          dataListNifty.splice(0, dataListNifty.length)
-          dataListBankNifty.splice(0, dataListBankNifty.length)
-          dataTickListNifty.splice(0, dataTickListNifty.length)
-          dataTickListBankNifty.splice(0, dataTickListBankNifty.length)
-
-          optionReqListNifty.splice(0, optionReqListNifty.length);
-          optionReqListBankNifty.splice(0, optionReqListBankNifty.length);
-          optionTickReqListNifty.splice(0, optionTickReqListNifty.length);
-          optionTickReqListBankNifty.splice(0, optionTickReqListBankNifty.length);
-
-          optionVolListNifty.splice(0, optionVolListNifty.length);
-          optionVolListBankNifty.splice(0, optionVolListBankNifty.length);
-          optionTickVolListNifty.splice(0, optionTickVolListNifty.length);
-          optionTickVolListBankNifty.splice(
-            0,
-            optionTickVolListBankNifty.length
-          );
-          let elList = [15, 30, 45, 60];
-          elList.forEach((dur) => {
-            finalListNifty[dur].splice(0, finalListNifty[dur].length);
-            finalListBankNifty[dur].splice(0, finalListBankNifty[dur].length);
-            finalTickListNifty[dur].splice(0, finalTickListNifty[dur].length);
-            finalTicklListBankNifty[dur].splice(
-              0,
-              finalTicklListBankNifty[dur].length
-            );
-          });
         }
       }, 60000); // loop each minute
 
@@ -347,6 +310,40 @@ module.exports = {
         clearInterval(minuteInterval);
         clearInterval(tickMsgInterval);
         clearInterval(minuteMsgInterval);
+      }
+
+      function clearAllQueues() {
+        // close the socket
+        const msg3 = "Global data instance is clearing all intervals!";
+        console.log(msg3, moment().toDate());
+        sendWSMessage(wsClient, msg3);
+        // clear all the intervals
+
+        // clear all the queues
+        dataListNifty.splice(0, dataListNifty.length);
+        dataListBankNifty.splice(0, dataListBankNifty.length);
+        dataTickListNifty.splice(0, dataTickListNifty.length);
+        dataTickListBankNifty.splice(0, dataTickListBankNifty.length);
+
+        optionReqListNifty.splice(0, optionReqListNifty.length);
+        optionReqListBankNifty.splice(0, optionReqListBankNifty.length);
+        optionTickReqListNifty.splice(0, optionTickReqListNifty.length);
+        optionTickReqListBankNifty.splice(0, optionTickReqListBankNifty.length);
+
+        optionVolListNifty.splice(0, optionVolListNifty.length);
+        optionVolListBankNifty.splice(0, optionVolListBankNifty.length);
+        optionTickVolListNifty.splice(0, optionTickVolListNifty.length);
+        optionTickVolListBankNifty.splice(0, optionTickVolListBankNifty.length);
+        let elList = [15, 30, 45, 60];
+        elList.forEach((dur) => {
+          finalListNifty[dur].splice(0, finalListNifty[dur].length);
+          finalListBankNifty[dur].splice(0, finalListBankNifty[dur].length);
+          finalTickListNifty[dur].splice(0, finalTickListNifty[dur].length);
+          finalTicklListBankNifty[dur].splice(
+            0,
+            finalTicklListBankNifty[dur].length
+          );
+        });
       }
 
       connection.on("error", function (error) {
@@ -520,7 +517,7 @@ module.exports = {
                 listItem = Result[0];
               }
               socketTickFlag.isNewTickSnapshot = true;
-              
+
               // const instrumentIdNifty = generateInstrumentId("NIFTY");
               const instrumentIdNifty = "NIFTY 50";
               if (Request.InstrumentIdentifier === instrumentIdNifty) {
@@ -616,7 +613,7 @@ module.exports = {
       const msg5 = "Global data instance initiated!, ";
       console.log(msg5, moment().toDate());
       sendWSMessage(wsClient, msg5);
+      client.connect(endpoint);
     });
-    client.connect(endpoint);
   },
 };
