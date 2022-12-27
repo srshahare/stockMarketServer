@@ -51,8 +51,7 @@ module.exports = {
     rule.tz = "Asia/Kolkata";
     rule.dayOfWeek = [0, new schedule.Range(1, 5)];
     rule.hour = 9;
-    rule.minute = 19;
-    rule.second = 30;
+    rule.minute = 15;
 
     client.on("connectFailed", function (error) {
       console.log(error);
