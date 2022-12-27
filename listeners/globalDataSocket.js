@@ -613,7 +613,7 @@ module.exports = {
       const msg5 = "Global data instance initiated!, ";
       console.log(msg5, moment().toDate());
       sendWSMessage(wsClient, msg5);
-      client.connect(endpoint);
     });
+    client.connect(endpoint);
   },
 };
