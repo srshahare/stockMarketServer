@@ -249,28 +249,37 @@ module.exports = {
 
       //Todo remove comment
       setTimeout(() => {
-        let tempInterval;
-        tempInterval = setInterval(() => {
-          if (AuthConnect && !initialized) {
-            initialized = true;
-            // clear all queues before initializing
-            clearAllQueues();
-            setTimeout(() => {
-              console.log("controllers initiated!, ", moment().toDate());
-              let msg1 = "minute controller initiated successfully!";
-              const msg2 = "tick controller initiated successfully!";
-              sendWSMessage(wsClient, msg1);
-              sendWSMessage(wsClient, msg2);
-              tickReqController(connection, wsClient);
-              minuteReqController(connection, wsClient);
-              clearInterval(tempInterval);
-            }, 2000);
-          } else if (!AuthConnect || !initialized) {
-            Authenticate();
-          } else {
-            clearInterval(tempInterval);
-          }
-        }, 5000); // check if user is authenticated after each 5 sec
+        console.log("controllers initiated!, ", moment().toDate());
+        let msg1 = "minute controller initiated successfully!";
+        const msg2 = "tick controller initiated successfully!";
+        sendWSMessage(wsClient, msg1);
+        sendWSMessage(wsClient, msg2);
+        clearAllQueues();
+        tickReqController(connection, wsClient);
+        minuteReqController(connection, wsClient);
+
+        // let tempInterval;
+        // tempInterval = setInterval(() => {
+        //   if (AuthConnect && !initialized) {
+        //     initialized = true;
+        //     // clear all queues before initializing
+        //     clearAllQueues();
+        //     setTimeout(() => {
+        //       console.log("controllers initiated!, ", moment().toDate());
+        //       let msg1 = "minute controller initiated successfully!";
+        //       const msg2 = "tick controller initiated successfully!";
+        //       sendWSMessage(wsClient, msg1);
+        //       sendWSMessage(wsClient, msg2);
+        //       tickReqController(connection, wsClient);
+        //       minuteReqController(connection, wsClient);
+        //       clearInterval(tempInterval);
+        //     }, 2000);
+        //   } else if (!AuthConnect || !initialized) {
+        //     Authenticate();
+        //   } else {
+        //     clearInterval(tempInterval);
+        //   }
+        // }, 5000); // check if user is authenticated after each 5 sec
       }, 20000); // wait for 20 seconds
 
       // Todo minute interval
