@@ -75,7 +75,7 @@ module.exports = {
     //       fromTime,
     //       "FutureHistory"
     //     );
-    //   }, 60000); // wait for 60 sec
+    //   }, 20000); // wait for 60 sec
     // }, 2000); // wait until pipeline generated
   },
 

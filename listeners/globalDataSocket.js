@@ -248,14 +248,16 @@ module.exports = {
 
       //Todo remove comment
       setTimeout(() => {
-        console.log("controllers initiated!, ", moment().toDate());
-        let msg1 = "minute controller initiated successfully!";
-        const msg2 = "tick controller initiated successfully!";
-        sendWSMessage(wsClient, msg1);
-        sendWSMessage(wsClient, msg2);
         clearAllQueues();
-        tickReqController(connection, wsClient);
-        minuteReqController(connection, wsClient);
+        setTimeout(() => {
+          console.log("controllers initiated!, ", moment().toDate());
+          let msg1 = "minute controller initiated successfully!";
+          const msg2 = "tick controller initiated successfully!";
+          sendWSMessage(wsClient, msg1);
+          sendWSMessage(wsClient, msg2);
+          // tickReqController(connection, wsClient);
+          minuteReqController(connection, wsClient);
+        }, 2000);
 
         // let tempInterval;
         // tempInterval = setInterval(() => {
@@ -279,7 +281,7 @@ module.exports = {
         //     clearInterval(tempInterval);
         //   }
         // }, 5000); // check if user is authenticated after each 5 sec
-      }, 20000); // wait for 20 seconds
+      }, 30000); // wait for 30 seconds
 
       // Todo minute interval
       mainInterval = setInterval(() => {
@@ -310,6 +312,7 @@ module.exports = {
           tickMsgInterval,
           minuteMsgInterval,
         } = socketInterval;
+
         clearInterval(niftyPipeInterval);
         clearInterval(bankNiftyPipeInterval);
         clearInterval(niftyTickPipeInterval);
@@ -325,7 +328,17 @@ module.exports = {
         const msg3 = "Global data instance is clearing all intervals!";
         console.log(msg3, moment().toDate());
         sendWSMessage(wsClient, msg3);
-        // clear all the intervals
+        // reinitialize all states
+        socketFlag.isNewSnapshot = false;
+        socketFlag.isNewNiftySnapshot = false;
+        socketFlag.isNewBankNiftySnapshot = false;
+        socketFlag.isOptionNiftyFetched = false;
+        socketFlag.isOptionBankNiftyFetched = false;
+        socketFlag.isOptionSumNiftyDone = false;
+        socketFlag.isOptionSumBankNiftyDone = false;
+        socketFlag.isExpoFinalDataNifty = false;
+        socketFlag.isExpoFinalDataBankNifty = false;
+
 
         // clear all the queues
         dataListNifty.splice(0, dataListNifty.length);
@@ -621,6 +634,7 @@ module.exports = {
       const msg5 = "Global data instance initiated!, ";
       console.log(msg5, moment().toDate());
       sendWSMessage(wsClient, msg5);
+      client.connect(endpoint)
     });
     client.connect(endpoint);
   },

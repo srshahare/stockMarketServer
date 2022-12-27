@@ -37,8 +37,7 @@ module.exports = {
         //*: stop the interval when the market is closed
         socketInterval.niftyPipeInterval = setInterval(async () => {
           // new data has arrived and queue of NIFTY is not empty
-          if (socketFlag.isNewNiftySnapshot && dataListNifty.length !== 0 && socketTickFlag.tickTimerDone) {
-            console.log("Nifty Option")
+          if (socketFlag.isNewNiftySnapshot && dataListNifty.length !== 0) {
             socketFlag.isNewNiftySnapshot = false;
             // no need to wait for that function (instant execution)
             const data = generateOptionSymbolsNifty(false);
@@ -57,9 +56,7 @@ module.exports = {
         socketInterval.bankNiftyPipeInterval = setInterval(() => {
           if (
             socketFlag.isNewBankNiftySnapshot &&
-            dataListBankNifty.length !== 0 && socketTickFlag.tickTimerDone
-          ) {
-            console.log("Bank Option")
+            dataListBankNifty.length !== 0) {
             socketFlag.isNewBankNiftySnapshot = false;
             // no need to wait for that function (instant execution)
             const data = generateOptionSymbolsBankNifty(false);
