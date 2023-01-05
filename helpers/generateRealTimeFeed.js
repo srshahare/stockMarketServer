@@ -1,26 +1,52 @@
 const product = require("../constants/product");
-const {socketFlag} = require("../constants/socketFlag");
-const { saveSnapshot } = require("../controllers/database/snapshotController");
-const { dataNifty, dataBankNifty } = require("../test/niftyData");
-const { generateSumOfVolOptionListNifty, generateSumOfVolOptionListBankNifty } = require("./options/optionVolListHandler");
-const { dataListNifty, dataListBankNifty } = require("./queue/dataQueue");
+const moment = require("moment");
+const { GetFutureHistory } = require("../listeners/socketManager");
+const { socketInterval } = require("../constants/socketFlag");
 
 module.exports = {
-  generateFeed: (ws) => {
-    // pretend like a real time data with 1 min interval
-    setInterval(() => {
-      socketFlag.isNewSnapshot = true;
-      socketFlag.isNewNiftySnapshot = true;
-      const niftyItem = dataNifty.pop();
-      dataListNifty.push(niftyItem);
-      socketFlag.isNewBankNiftySnapshot = true;
-      const bankItem = dataBankNifty.pop();
-      dataListBankNifty.push(bankItem);
-      // store snapshot to database
-      //* (item, interval[30/60], exchangeName, )
-      saveSnapshot(niftyItem, "60", product.NIFTY)
-      saveSnapshot(bankItem, "60", product.BANKNIFTY)
+  generateFeed: (conn) => {
+    const instrumentId1 = "NIFTY 50";
+    // const instrumentId2 = generateInstrumentId(product.BANKNIFTY);
+    const instrumentId2 = "NIFTY BANK";
+    const month = moment().month();
+    const date = moment().date();
+    const year = moment().year();
+    let fromTime = moment([year, month, date, 9, 15, 00, 00]).unix();
 
-    }, 8000);
+    setTimeout(() => {
+      GetFutureHistory(
+        conn,
+        instrumentId1,
+        fromTime,
+        fromTime,
+        "FutureHistory"
+      );
+      GetFutureHistory(
+        conn,
+        instrumentId2,
+        fromTime,
+        fromTime,
+        "FutureHistory"
+      );
+
+      socketInterval.minuteInterval = setInterval(() => {
+        fromTime = fromTime + 60;
+        console.log("Minute Call, ", moment(fromTime).toDate());
+        GetFutureHistory(
+          conn,
+          instrumentId1,
+          fromTime,
+          fromTime,
+          "FutureHistory"
+        );
+        GetFutureHistory(
+          conn,
+          instrumentId2,
+          fromTime,
+          fromTime,
+          "FutureHistory"
+        );
+      }, 30000); // wait for 60 sec
+    }, 500); // wait until pipeline generated
   },
 };

@@ -37,6 +37,8 @@ const { saveOptionData } = require("../controllers/database/optionController");
 const { saveSnapshot } = require("../controllers/database/snapshotController");
 const { sendWSMessage } = require("../helpers/sendMessage");
 const { syncControllers } = require("../controllers/request/syncControllers");
+const { GetFutureHistory } = require("./socketManager");
+const { generateFeed } = require("../helpers/generateRealTimeFeed");
 
 var client = new websocketClient();
 
@@ -82,15 +84,6 @@ module.exports = {
           const { requestType, exchange, duration, subscribe } = serverData;
           socket.messageData = serverData;
           try {
-            if (!requestType || !exchange || !duration) {
-              return socket.send(
-                JSON.stringify({
-                  MessageType: "RequestError",
-                  message:
-                    "requestType, exchange, duration (Required Parameters)",
-                })
-              );
-            }
             if (requestType === "Connect") {
               conn.close();
               const msg4 = "Global data instance has stopped!";
@@ -102,6 +95,20 @@ module.exports = {
             if (requestType === "Sync") {
               syncControllers(conn);
             }
+            if(requestType === "Stop") {
+              clearInterval(socketInterval.niftyPipeInterval)
+              clearInterval(socketInterval.bankNiftyPipeInterval)
+            }
+            if (!requestType || !exchange || !duration) {
+              return socket.send(
+                JSON.stringify({
+                  MessageType: "RequestError",
+                  message:
+                    "requestType, exchange, duration (Required Parameters)",
+                })
+              );
+            }
+            
             if (requestType === types.GetMinuteData) {
               // send first chunk of data
               // const d = await fetchLatestExpoAvgData(exchange, "60", duration);
@@ -244,20 +251,75 @@ module.exports = {
       var initialized = false;
       let mainInterval = null;
 
+      // checksum variables
+      let checkCounter = optionVolListNifty.length;
+
       Authenticate();
+
+      const checkRule = new schedule.RecurrenceRule();
+      checkRule.tz = "Asia/Kolkata";
+      checkRule.dayOfWeek = [0, new schedule.Range(1, 5)];
+      checkRule.hour = 9;
+      checkRule.minute = 16;
+      checkRule.second = 10;
+      const checksumJob = schedule.scheduleJob("checksum", checkRule, () => {
+        // initialize exactly at 9:16:10 am
+        resyncData();
+      });
+
+      function resyncData() {
+        try {
+          console.log("Data Checksum is initialized!")
+          checkCounter += 1;
+          socketInterval.checksumInterval = setInterval(() => {
+            // check if data is coming every minute
+            checkCounter += 1;
+            if (checkCounter > optionVolListNifty.length) {
+              // data has stopped coming reinitialize intervalController
+              // get the last unsynced element
+              console.log("Reinitializing the controllers!, ", moment().toDate())
+              // const lastItem = optionVolListNifty.at(-1);
+              // const lastTimestamp = lastItem.tradeTime + 60;
+
+              clearAllIntervals();
+              clearAllQueues(true); // not clearing expo and vol queues
+
+              minuteReqController(connection, wsClient);
+              checkCounter = optionVolListNifty.length;
+              // setTimeout(() => {
+              //   [("NIFTY 50", "NIFTY BANK")].forEach((inst) => {
+              //     GetFutureHistory(
+              //       connection,
+              //       inst,
+              //       lastTimestamp,
+              //       lastTimestamp,
+              //       "FutureHistory"
+              //     );
+              //   });
+              // }, 3000);
+            }
+          }, 60000); // checksum for each minute
+        } catch (err) {
+          console.log(err);
+        }
+      }
 
       //Todo remove comment
       setTimeout(() => {
-        clearAllQueues();
+        clearAllQueues(false); // clear all queues
+
         setTimeout(() => {
           console.log("controllers initiated!, ", moment().toDate());
-          let msg1 = "minute controller initiated successfully!";
-          const msg2 = "tick controller initiated successfully!";
-          sendWSMessage(wsClient, msg1);
-          sendWSMessage(wsClient, msg2);
+          // let msg1 = "minute controller initiated successfully!";
+          // const msg2 = "tick controller initiated successfully!";
+          // sendWSMessage(wsClient, msg1);
+          // sendWSMessage(wsClient, msg2);
           // tickReqController(connection, wsClient);
           minuteReqController(connection, wsClient);
-        }, 2000);
+
+          //Todo (Dev) generate real time feed
+          // generateFeed(connection);
+        }, 500);
 
         // let tempInterval;
         // tempInterval = setInterval(() => {
@@ -281,7 +343,7 @@ module.exports = {
         //     clearInterval(tempInterval);
         //   }
         // }, 5000); // check if user is authenticated after each 5 sec
-      }, 30000); // wait for 30 seconds
+      }, 50000); // wait for 50 seconds
 
       // Todo minute interval
       mainInterval = setInterval(() => {
@@ -297,11 +359,14 @@ module.exports = {
           setTimeout(() => {
             doClose();
             clearAllIntervals();
+            clearInterval(mainInterval);
           }, 5000);
         }
       }, 60000); // loop each minute
 
       function clearAllIntervals() {
+        const msg3 = "Instance cleared all intervals!";
+        console.log(msg3, moment().toDate());
         const {
           niftyPipeInterval,
           bankNiftyPipeInterval,
@@ -311,6 +376,7 @@ module.exports = {
           minuteInterval,
           tickMsgInterval,
           minuteMsgInterval,
+          checksumInterval
         } = socketInterval;
 
         clearInterval(niftyPipeInterval);
@@ -318,16 +384,17 @@ module.exports = {
         clearInterval(niftyTickPipeInterval);
         clearInterval(bankNiftyTickPipeInterval);
         clearInterval(tickInterval);
-        clearInterval(minuteInterval);
+        // clearInterval(minuteInterval);
         clearInterval(tickMsgInterval);
         clearInterval(minuteMsgInterval);
+        clearInterval(checksumInterval)
       }
 
-      function clearAllQueues() {
+      function clearAllQueues(preserved) {
         // close the socket
-        const msg3 = "Global data instance is clearing all intervals!";
+        const msg3 = "Instance cleared all queues!";
         console.log(msg3, moment().toDate());
-        sendWSMessage(wsClient, msg3);
+        // sendWSMessage(wsClient, msg3);
         // reinitialize all states
         socketFlag.isNewSnapshot = false;
         socketFlag.isNewNiftySnapshot = false;
@@ -338,7 +405,6 @@ module.exports = {
         socketFlag.isOptionSumBankNiftyDone = false;
         socketFlag.isExpoFinalDataNifty = false;
         socketFlag.isExpoFinalDataBankNifty = false;
-
 
         // clear all the queues
         dataListNifty.splice(0, dataListNifty.length);
@@ -351,20 +417,25 @@ module.exports = {
         optionTickReqListNifty.splice(0, optionTickReqListNifty.length);
         optionTickReqListBankNifty.splice(0, optionTickReqListBankNifty.length);
 
-        optionVolListNifty.splice(0, optionVolListNifty.length);
-        optionVolListBankNifty.splice(0, optionVolListBankNifty.length);
-        optionTickVolListNifty.splice(0, optionTickVolListNifty.length);
-        optionTickVolListBankNifty.splice(0, optionTickVolListBankNifty.length);
-        let elList = [15, 30, 45, 60];
-        elList.forEach((dur) => {
-          finalListNifty[dur].splice(0, finalListNifty[dur].length);
-          finalListBankNifty[dur].splice(0, finalListBankNifty[dur].length);
-          finalTickListNifty[dur].splice(0, finalTickListNifty[dur].length);
-          finalTicklListBankNifty[dur].splice(
+        if (!preserved) {
+          optionVolListNifty.splice(0, optionVolListNifty.length);
+          optionVolListBankNifty.splice(0, optionVolListBankNifty.length);
+          optionTickVolListNifty.splice(0, optionTickVolListNifty.length);
+          optionTickVolListBankNifty.splice(
             0,
-            finalTicklListBankNifty[dur].length
+            optionTickVolListBankNifty.length
           );
-        });
+          let elList = [15, 30, 45, 60];
+          elList.forEach((dur) => {
+            finalListNifty[dur].splice(0, finalListNifty[dur].length);
+            finalListBankNifty[dur].splice(0, finalListBankNifty[dur].length);
+            finalTickListNifty[dur].splice(0, finalTickListNifty[dur].length);
+            finalTicklListBankNifty[dur].splice(
+              0,
+              finalTicklListBankNifty[dur].length
+            );
+          });
+        }
       }
 
       connection.on("error", function (error) {
@@ -629,12 +700,13 @@ module.exports = {
         }
       }
     });
+
     // Todo uncomment and schedule handling
     const job = schedule.scheduleJob("globalSocket", rule, () => {
       const msg5 = "Global data instance initiated!, ";
       console.log(msg5, moment().toDate());
       sendWSMessage(wsClient, msg5);
-      client.connect(endpoint)
+      client.connect(endpoint);
     });
     client.connect(endpoint);
   },

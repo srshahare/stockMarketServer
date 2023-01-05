@@ -47,5 +47,6 @@ module.exports = {
     minuteMsgInterval: null,
 
     syncInterval: null,
+    checksumInterval: null,
   },
 };
