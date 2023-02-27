@@ -21,6 +21,8 @@ const {
   optionVolListBankNifty,
   finalListNifty,
   finalListBankNifty,
+  indexListNifty,
+  indexListBankNifty,
 } = require("../helpers/queue/dataQueue");
 const product = require("../constants/product");
 const {
@@ -95,10 +97,6 @@ module.exports = {
             if (requestType === "Sync") {
               syncControllers(conn);
             }
-            if(requestType === "Stop") {
-              clearInterval(socketInterval.niftyPipeInterval)
-              clearInterval(socketInterval.bankNiftyPipeInterval)
-            }
             if (!requestType || !exchange || !duration) {
               return socket.send(
                 JSON.stringify({
@@ -108,7 +106,7 @@ module.exports = {
                 })
               );
             }
-            
+
             if (requestType === types.GetMinuteData) {
               // send first chunk of data
               // const d = await fetchLatestExpoAvgData(exchange, "60", duration);
@@ -194,6 +192,51 @@ module.exports = {
               };
               socket.send(JSON.stringify(msgData));
               callDone = true;
+            } else if (requestType === types.GetIndexData) {
+              // send first chunk of data
+              // const data = await fetchLatestVolumeData(exchange, "30");
+              // const refactoredData = await refactorFinalData(data, "vol");
+              const data =
+                exchange === product.NIFTY
+                  ? indexListNifty
+                  : indexListBankNifty;
+              const msgData = {
+                MessageType: "GetIndexData",
+                Request: {
+                  count: data.length,
+                  Interval: "60",
+                  Exchange: exchange,
+                },
+                Result: data,
+              };
+              socket.send(JSON.stringify(msgData));
+              callDone = true;
+            } else if (requestType === types.GetBothData) {
+              const niftyData = finalListNifty[duration];
+              const bankData = finalListBankNifty[duration]
+              const msgDataNifty = {
+                MessageType: "GetMinuteData",
+                Request: {
+                  count: niftyData.length,
+                  Interval: "60",
+                  Exchange: product.NIFTY,
+                  Duration: duration,
+                },
+                Result: niftyData,
+              };
+              socket.send(JSON.stringify(msgDataNifty));
+              const msgDataBank = {
+                MessageType: "GetMinuteData",
+                Request: {
+                  count: bankData.length,
+                  Interval: "60",
+                  Exchange: product.BANKNIFTY,
+                  Duration: duration,
+                },
+                Result: bankData,
+              };
+              socket.send(JSON.stringify(msgDataBank));
+              callDone = true;
             } else {
               socket.send(
                 JSON.stringify({
@@ -264,12 +307,12 @@ module.exports = {
       checkRule.second = 10;
       const checksumJob = schedule.scheduleJob("checksum", checkRule, () => {
         // initialize exactly at 9:16:10 am
-        resyncData();
+        // resyncData();
       });
 
       function resyncData() {
         try {
-          console.log("Data Checksum is initialized!")
+          console.log("Data Checksum is initialized!");
           checkCounter += 1;
           socketInterval.checksumInterval = setInterval(() => {
             // check if data is coming every minute
@@ -277,7 +320,10 @@ module.exports = {
             if (checkCounter > optionVolListNifty.length) {
               // data has stopped coming reinitialize intervalController
               // get the last unsynced element
-              console.log("Reinitializing the controllers!, ", moment().toDate())
+              console.log(
+                "Reinitializing the controllers!, ",
+                moment().toDate()
+              );
               // const lastItem = optionVolListNifty.at(-1);
               // const lastTimestamp = lastItem.tradeTime + 60;
 
@@ -376,7 +422,7 @@ module.exports = {
           minuteInterval,
           tickMsgInterval,
           minuteMsgInterval,
-          checksumInterval
+          checksumInterval,
         } = socketInterval;
 
         clearInterval(niftyPipeInterval);
@@ -387,7 +433,7 @@ module.exports = {
         // clearInterval(minuteInterval);
         clearInterval(tickMsgInterval);
         clearInterval(minuteMsgInterval);
-        clearInterval(checksumInterval)
+        clearInterval(checksumInterval);
       }
 
       function clearAllQueues(preserved) {
@@ -407,6 +453,8 @@ module.exports = {
         socketFlag.isExpoFinalDataBankNifty = false;
 
         // clear all the queues
+        indexListNifty.splice(0, indexListNifty.length);
+        indexListBankNifty.splice(0, indexListBankNifty.length);
         dataListNifty.splice(0, dataListNifty.length);
         dataListBankNifty.splice(0, dataListBankNifty.length);
         dataTickListNifty.splice(0, dataTickListNifty.length);
@@ -439,6 +487,7 @@ module.exports = {
       }
 
       connection.on("error", function (error) {
+        console.log(error);
         console.log("Connection Error: " + error.toString());
       });
       connection.on("close", function () {
@@ -471,12 +520,28 @@ module.exports = {
             const date = moment().date();
             const year = moment().year();
             let fromTime = moment([year, month, date, 9, 15, 00, 00]).unix();
-
+            let listItem = {
+              exchange: product.NIFTY,
+              interval: "60",
+              dataType: "IndexData",
+              duration: "0",
+              tradeTime: data.LastTradeTime,
+              date: moment
+                .unix(data.LastTradeTime)
+                .format("DD/MM/YYYY hh:mm:ss"),
+              data: data,
+            };
             if (data.LastTradeTime >= fromTime) {
               socketTickFlag.tickTimerDone = false;
               if (data.InstrumentIdentifier === instrumentIdNifty) {
                 dataListNifty.push(data);
                 dataTickListNifty.push(data);
+                listItem = {
+                  ...listItem,
+                  exchange: product.NIFTY,
+                };
+                indexListNifty.push(listItem);
+                sendWSMessage(wsClient, listItem);
 
                 // for min data
                 socketFlag.isNewNiftySnapshot = true;
@@ -490,6 +555,12 @@ module.exports = {
               } else {
                 dataListBankNifty.push(data);
                 dataTickListBankNifty.push(data);
+                listItem = {
+                  ...listItem,
+                  exchange: product.BANKNIFTY,
+                };
+                indexListBankNifty.push(listItem);
+                sendWSMessage(wsClient, listItem);
 
                 // for min data
                 socketFlag.isNewBankNiftySnapshot = true;
@@ -524,11 +595,28 @@ module.exports = {
               // const instrumentIdNifty = generateInstrumentId("NIFTY");
               const instrumentIdNifty = "NIFTY 50";
               socketTickFlag.tickTimerDone = false;
+              let listItem = {
+                exchange: product.NIFTY,
+                interval: "60",
+                dataType: "IndexData",
+                duration: "0",
+                tradeTime: item.LastTradeTime,
+                date: moment
+                  .unix(item.LastTradeTime)
+                  .format("DD/MM/YYYY hh:mm:ss"),
+                data: item,
+              };
 
               if (Request.InstrumentIdentifier === instrumentIdNifty) {
                 if (Result.length > 0) {
                   dataListNifty.push(item);
                   dataTickListNifty.push(item);
+                  listItem = {
+                    ...listItem,
+                    exchange: product.NIFTY,
+                  };
+                  indexListNifty.push(listItem);
+                  sendWSMessage(wsClient, listItem);
                 }
                 // for min data
                 socketFlag.isNewNiftySnapshot = true;
@@ -543,6 +631,12 @@ module.exports = {
                 if (Result.length > 0) {
                   dataListBankNifty.push(item);
                   dataTickListBankNifty.push(item);
+                  listItem = {
+                    ...listItem,
+                    exchange: product.BANKNIFTY,
+                  };
+                  indexListBankNifty.push(listItem);
+                  sendWSMessage(wsClient, listItem);
                 }
                 // for min data
                 socketFlag.isNewBankNiftySnapshot = true;

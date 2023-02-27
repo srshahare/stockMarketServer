@@ -4,6 +4,9 @@ module.exports = {
   // queue which takes the future data for BANKNIFTY
   dataListBankNifty: [],
 
+  indexListNifty: [],
+  indexListBankNifty: [],
+
   // queue which takes the option data for NIFTY
   optionReqListNifty: [],
   // queue which takes the option data for BANKNIFTY

@@ -9,4 +9,5 @@ module.exports = {
     GetTickData: "GetTickData",
     GetTickVolData: "GetTickVolData",
     GetBothData: "GetBothData",
+    GetIndexData: "GetIndexData"
 }

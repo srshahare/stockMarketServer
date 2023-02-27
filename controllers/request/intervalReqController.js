@@ -32,7 +32,7 @@ module.exports = {
     const month = moment().month();
     const date = moment().date();
     const year = moment().year();
-    let fromTime = moment([year, month, date, 9, 15, 00, 00]).unix();
+    let fromTime = moment([year, month, 27, 9, 15, 00, 00]).unix();
 
     // create 2 pipeline for NIFTY(PE/CE) & BANKNIFTY(PE/CE)
     generatePipeline(conn, wss, product.NIFTY);
@@ -75,7 +75,7 @@ module.exports = {
     //       fromTime,
     //       "FutureHistory"
     //     );
-    //   }, 20000); // wait for 60 sec
+    //   }, 12000); // wait for 60 sec
     // }, 2000); // wait until pipeline generated
   },
 

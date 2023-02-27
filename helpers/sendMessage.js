@@ -1,4 +1,4 @@
-const moment = require("moment")
+const moment = require("moment");
 const product = require("../constants/product");
 const types = require("../constants/types");
 const {
@@ -6,6 +6,8 @@ const {
   finalListBankNifty,
   optionVolListNifty,
   optionVolListBankNifty,
+  indexListNifty,
+  indexListBankNifty,
 } = require("./queue/dataQueue");
 const {
   finalTickListNifty,
@@ -21,7 +23,40 @@ module.exports = {
         const { subscribe, duration, requestType, exchange } = ws?.messageData;
         if (subscribe === true) {
           let msgData = "";
-          if (exchange === product.NIFTY && data.exchange === product.NIFTY) {
+          if (exchange === "Both" && requestType === types.GetBothData) {
+            if (data.interval === "60" && data.dataType === "ExpoAverage") {
+              if (data.duration === duration) {
+                if (data.exchange === product.NIFTY) {
+                  const niftyData = {
+                    MessageType: "GetMinuteData",
+                    Request: {
+                      count: finalListNifty[duration].length,
+                      Interval: "60",
+                      Exchange: product.NIFTY,
+                      Duration: duration,
+                    },
+                    Result: data,
+                  };
+                  ws.send(JSON.stringify(niftyData));
+                } else {
+                  const bankData = {
+                    MessageType: "GetMinuteData",
+                    Request: {
+                      count: finalListBankNifty[duration].length,
+                      Interval: "60",
+                      Exchange: product.BANKNIFTY,
+                      Duration: duration,
+                    },
+                    Result: data,
+                  };
+                  ws.send(JSON.stringify(bankData));
+                }
+              }
+            }
+          } else if (
+            exchange === product.NIFTY &&
+            data.exchange === product.NIFTY
+          ) {
             switch (requestType) {
               case types.GetMinuteData:
                 if (data.interval === "60" && data.dataType === "ExpoAverage") {
@@ -37,6 +72,19 @@ module.exports = {
                       Result: data,
                     };
                   }
+                }
+                break;
+              case types.GetIndexData:
+                if (data.interval === "60" && data.dataType === "IndexData") {
+                  msgData = {
+                    MessageType: "GetIndexData",
+                    Request: {
+                      count: indexListNifty.length,
+                      Interval: "60",
+                      Exchange: exchange,
+                    },
+                    Result: data,
+                  };
                 }
                 break;
               case types.GetTickData:
@@ -113,6 +161,19 @@ module.exports = {
                   }
                 }
                 break;
+              case types.GetIndexData:
+                if (data.interval === "60" && data.dataType === "IndexData") {
+                  msgData = {
+                    MessageType: "GetIndexData",
+                    Request: {
+                      count: indexListBankNifty.length,
+                      Interval: "60",
+                      Exchange: exchange,
+                    },
+                    Result: data,
+                  };
+                }
+                break;
               case types.GetTickData:
                 if (data.interval === "30" && data.dataType === "ExpoAverage") {
                   if (data.duration === duration) {
@@ -167,17 +228,17 @@ module.exports = {
                 };
             }
           }
-          if(requestType === "ServerInfo") {
+          if (requestType === "ServerInfo") {
             msgData = {
               Request: {
                 MessageType: "ServerInfo",
-                date: moment().toDate()
+                date: moment().toDate(),
               },
               Result: {
-                message: data
-              }
-            }
-            ws.send(JSON.stringify(msgData))
+                message: data,
+              },
+            };
+            ws.send(JSON.stringify(msgData));
           }
           if (msgData !== "") {
             ws.send(JSON.stringify(msgData));
