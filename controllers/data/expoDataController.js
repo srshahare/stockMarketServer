@@ -1,13 +1,15 @@
 const moment = require("moment");
 const option = require("../../constants/option");
 const product = require("../../constants/product");
-const chart = require("../../constants/chart")
+const chart = require("../../constants/chart");
 const { socketFlag, socketTickFlag } = require("../../constants/socketFlag");
 const {
   optionVolListNifty,
   finalListNifty,
   optionVolListBankNifty,
   finalListBankNifty,
+  indexListNifty,
+  indexListBankNifty,
 } = require("../../helpers/queue/dataQueue");
 const {
   optionTickVolListNifty,
@@ -41,6 +43,15 @@ module.exports = {
       //   chart.STANDARD
       // );
       sendWSMessage(wss, listItem);
+
+      const indexItems = [...indexListNifty];
+      const indexItem = indexItems.pop();
+      let iListItem = {
+        ...listItem,
+        dataType: "IndexData",
+        indexData: indexItem,
+      };
+      sendWSMessage(wss, iListItem);
     } else if (optionVolListNifty.length > intervalDuration) {
       const tempVolListNifty = [...optionVolListNifty];
       const tempFinalListNifty = generateTempFinalList(
@@ -68,6 +79,15 @@ module.exports = {
       //   chart.STANDARD
       // );
       sendWSMessage(wss, listItem);
+
+      const indexItems = [...indexListNifty];
+      const indexItem = indexItems.pop();
+      let iListItem = {
+        ...listItem,
+        dataType: "IndexData",
+        indexData: indexItem,
+      };
+      sendWSMessage(wss, iListItem);
     }
   },
   generateExpoDataBankNifty: (tradeTime, duration, wss) => {
@@ -92,6 +112,15 @@ module.exports = {
       //   chart.STANDARD
       // );
       sendWSMessage(wss, listItem);
+
+      const indexItems = [...indexListBankNifty];
+      const indexItem = indexItems.pop();
+      let iListItem = {
+        ...listItem,
+        dataType: "IndexData",
+        indexData: indexItem,
+      };
+      sendWSMessage(wss, iListItem);
     } else if (optionVolListBankNifty.length > intervalDuration) {
       const tempVolListBankNifty = [...optionVolListBankNifty];
       const tempFinalListBankNifty = generateTempFinalList(
@@ -119,6 +148,15 @@ module.exports = {
       //   chart.STANDARD
       // );
       sendWSMessage(wss, listItem);
+
+      const indexItems = [...indexListBankNifty];
+      const indexItem = indexItems.pop();
+      let iListItem = {
+        ...listItem,
+        dataType: "IndexData",
+        indexData: indexItem,
+      };
+      sendWSMessage(wss, iListItem);
     }
   },
   generateExpoTickDataNifty: (tradeTime, duration, wss) => {

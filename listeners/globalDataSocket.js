@@ -200,20 +200,28 @@ module.exports = {
                 exchange === product.NIFTY
                   ? indexListNifty
                   : indexListBankNifty;
+              const expoData =
+                exchange === product.NIFTY
+                  ? finalListNifty[duration]
+                  : finalListBankNifty[duration];
               const msgData = {
                 MessageType: "GetIndexData",
                 Request: {
                   count: data.length,
                   Interval: "60",
                   Exchange: exchange,
+                  Duration: duration,
                 },
-                Result: data,
+                Result: {
+                  expoData,
+                  indexData: data
+                },
               };
               socket.send(JSON.stringify(msgData));
               callDone = true;
             } else if (requestType === types.GetBothData) {
               const niftyData = finalListNifty[duration];
-              const bankData = finalListBankNifty[duration]
+              const bankData = finalListBankNifty[duration];
               const msgDataNifty = {
                 MessageType: "GetMinuteData",
                 Request: {
@@ -541,7 +549,7 @@ module.exports = {
                   exchange: product.NIFTY,
                 };
                 indexListNifty.push(listItem);
-                sendWSMessage(wsClient, listItem);
+                // sendWSMessage(wsClient, listItem);
 
                 // for min data
                 socketFlag.isNewNiftySnapshot = true;
@@ -560,7 +568,7 @@ module.exports = {
                   exchange: product.BANKNIFTY,
                 };
                 indexListBankNifty.push(listItem);
-                sendWSMessage(wsClient, listItem);
+                // sendWSMessage(wsClient, listItem);
 
                 // for min data
                 socketFlag.isNewBankNiftySnapshot = true;
@@ -616,7 +624,7 @@ module.exports = {
                     exchange: product.NIFTY,
                   };
                   indexListNifty.push(listItem);
-                  sendWSMessage(wsClient, listItem);
+                  // sendWSMessage(wsClient, listItem);
                 }
                 // for min data
                 socketFlag.isNewNiftySnapshot = true;
@@ -636,7 +644,7 @@ module.exports = {
                     exchange: product.BANKNIFTY,
                   };
                   indexListBankNifty.push(listItem);
-                  sendWSMessage(wsClient, listItem);
+                  // sendWSMessage(wsClient, listItem);
                 }
                 // for min data
                 socketFlag.isNewBankNiftySnapshot = true;

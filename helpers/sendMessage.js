@@ -76,15 +76,18 @@ module.exports = {
                 break;
               case types.GetIndexData:
                 if (data.interval === "60" && data.dataType === "IndexData") {
-                  msgData = {
-                    MessageType: "GetIndexData",
-                    Request: {
-                      count: indexListNifty.length,
-                      Interval: "60",
-                      Exchange: exchange,
-                    },
-                    Result: data,
-                  };
+                  if (data.duration === duration) {
+                    msgData = {
+                      MessageType: "GetIndexData",
+                      Request: {
+                        count: indexListNifty.length,
+                        Interval: "60",
+                        Exchange: exchange,
+                        Duration: duration,
+                      },
+                      Result: data,
+                    };
+                  }
                 }
                 break;
               case types.GetTickData:
@@ -163,15 +166,18 @@ module.exports = {
                 break;
               case types.GetIndexData:
                 if (data.interval === "60" && data.dataType === "IndexData") {
-                  msgData = {
-                    MessageType: "GetIndexData",
-                    Request: {
-                      count: indexListBankNifty.length,
-                      Interval: "60",
-                      Exchange: exchange,
-                    },
-                    Result: data,
-                  };
+                  if (data.duration === duration) {
+                    msgData = {
+                      MessageType: "GetIndexData",
+                      Request: {
+                        count: indexListBankNifty.length,
+                        Interval: "60",
+                        Exchange: exchange,
+                        Duration: duration,
+                      },
+                      Result: data,
+                    };
+                  }
                 }
                 break;
               case types.GetTickData:
