@@ -72,4 +72,41 @@ module.exports = {
       }
     });
   },
+
+  fetchExpoAvgData: (exchange, interval, duration, uptoDate) => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const expoAvgData = await ExpoAvg.findAndCountAll({
+          where: {
+            [Op.and]: [
+              {
+                createdAt: {
+                  [Op.gte]: uptoDate.toDate(),
+                },
+              },
+              { exchangeName: exchange },
+              { interval: interval },
+              { duration: duration },
+            ],
+          },
+          order: [["timeStamp", "DESC"]],
+          limit: 800,
+        });
+        if(expoAvgData) {
+            resolve(expoAvgData)
+        }else {
+            reject({
+                status: 402,
+                message: "Error in fetching the data"
+            })
+        }
+      } catch (err) {
+        reject({
+            status: 500,
+            message: err.message
+        })
+        console.log(err);
+      }
+    });
+  },
 };

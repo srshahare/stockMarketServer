@@ -34,6 +34,8 @@ module.exports = {
       );
       pushExpoItem(listItem, intervalDuration, product.NIFTY);
       socketFlag.isExpoFinalDataNifty = true;
+      sendWSMessage(wss, listItem);
+
       // save expo avg data to db
       // saveExpoAvgData(
       //   listItem,
@@ -42,7 +44,6 @@ module.exports = {
       //   product.NIFTY,
       //   chart.STANDARD
       // );
-      sendWSMessage(wss, listItem);
 
       const indexItems = [...indexListNifty];
       const indexItem = indexItems.pop();

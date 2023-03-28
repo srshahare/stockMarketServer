@@ -18,13 +18,15 @@ app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 
 //Todo Database Configuration
-db.sequelize.sync({ force: false }).then(() => {
+db.sequelize.sync({ force: true }).then(() => {
   console.log("DB Synced!");
 });
 
 app.use((err, req, res, next) => {
   res.status(500).send({ message: err.message });
 });
+
+app.use("/data", require("./routes/data.routes"))
 
 app.get("/status", (req, res, next) => {
   res.status(200).json({

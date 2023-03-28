@@ -513,7 +513,7 @@ module.exports = {
           if (data.MessageType !== "Echo") {
             wsClient.clients.forEach((ws) => {
               if (ws.isAlive) {
-                // ws.send(JSON.stringify(data));
+                ws.send(JSON.stringify(data));
               }
             });
           }
@@ -554,7 +554,7 @@ module.exports = {
                 // for min data
                 socketFlag.isNewNiftySnapshot = true;
                 socketFlag.isExpoFinalDataNifty = false;
-                // saveSnapshot(data, "60", product.NIFTY);
+                // saveSnapshot(listItem, "60", product.NIFTY);
 
                 // for tick data
                 socketTickFlag.isNewTickNiftySnapshot = true;
@@ -573,7 +573,7 @@ module.exports = {
                 // for min data
                 socketFlag.isNewBankNiftySnapshot = true;
                 socketFlag.isExpoFinalDataBankNifty = false;
-                // saveSnapshot(data, "60", product.BANKNIFTY);
+                // saveSnapshot(listItem, "60", product.BANKNIFTY);
 
                 // for tick data
                 socketTickFlag.isNewTickBankNiftySnapshot = true;
@@ -629,7 +629,7 @@ module.exports = {
                 // for min data
                 socketFlag.isNewNiftySnapshot = true;
                 socketFlag.isExpoFinalDataNifty = false;
-                // saveSnapshot(item, interval, product.NIFTY);
+                saveSnapshot(listItem, interval, product.NIFTY);
 
                 // for tick data
                 socketTickFlag.isNewTickNiftySnapshot = true;
@@ -649,7 +649,7 @@ module.exports = {
                 // for min data
                 socketFlag.isNewBankNiftySnapshot = true;
                 socketFlag.isExpoFinalDataBankNifty = false;
-                // saveSnapshot(item, interval, product.BANKNIFTY);
+                saveSnapshot(listItem, interval, product.BANKNIFTY);
 
                 // for tick data
                 socketTickFlag.isNewTickBankNiftySnapshot = true;

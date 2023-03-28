@@ -145,7 +145,9 @@ module.exports = {
 
 function generateOptionSymbol(product, strikePrice, optionType) {
   const lastThuDay = getLastWeeksThursday();
-  const formattedDate = lastThuDay.format("DDMMMYY");
+  //TODO change this after
+  // const formattedDate = lastThuDay.format("DDMMMYY");
+  const formattedDate = "29MAR23"
   const capitalizedDate = formattedDate.toUpperCase();
   const optionSymbol = `${product}${capitalizedDate}${Math.abs(strikePrice)}${optionType}`;
   return optionSymbol;
