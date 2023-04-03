@@ -38,8 +38,8 @@ module.exports = {
     generatePipeline(conn, wss, product.NIFTY);
     generatePipeline(conn, wss, product.BANKNIFTY);
 
-    // SubscribeSnapshot(conn, instrumentId1, false);
-    // SubscribeSnapshot(conn, instrumentId2, false);
+    SubscribeSnapshot(conn, instrumentId1, false);
+    SubscribeSnapshot(conn, instrumentId2, false);
 
     // console.log("Minute Call, ", moment(fromTime).toDate());
     // setTimeout(() => {
