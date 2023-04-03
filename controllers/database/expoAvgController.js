@@ -76,7 +76,17 @@ module.exports = {
   fetchExpoAvgData: (exchange, interval, duration, uptoDate) => {
     return new Promise(async (resolve, reject) => {
       try {
-        const expoAvgData = await ExpoAvg.findAndCountAll({
+        let limit = 360;
+        if(duration === "15") {
+          limit = 360
+        }else if (duration === "30") {
+          limit = 345
+        }else if (duration === "45") {
+          limit = 330
+        }else {
+          limit = 315
+        }
+        const expoAvgData = await ExpoAvg.findAll({
           where: {
             [Op.and]: [
               {
@@ -90,7 +100,7 @@ module.exports = {
             ],
           },
           order: [["timeStamp", "DESC"]],
-          limit: 800,
+          limit: limit,
         });
         if(expoAvgData) {
             resolve(expoAvgData)

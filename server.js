@@ -18,7 +18,7 @@ app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 
 //Todo Database Configuration
-db.sequelize.sync({ force: true }).then(() => {
+db.sequelize.sync({ force: false }).then(() => {
   console.log("DB Synced!");
 });
 
@@ -42,7 +42,7 @@ socket.wsInstance(server, app);
 
 
 //* Running server
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5080;
 server.listen(PORT, () => {
   console.log("database HOST, ", process.env.DB_HOST);
   console.log("Server is running on port,", PORT);

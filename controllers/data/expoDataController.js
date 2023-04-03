@@ -19,6 +19,7 @@ const {
 } = require("../../helpers/queue/dataTickQueue");
 const { sendWSMessage } = require("../../helpers/sendMessage");
 const { saveExpoAvgData } = require("../database/expoAvgController");
+const { saveSnapshot } = require("../database/snapshotController");
 
 module.exports = {
   generateExpoDataNifty: (tradeTime, duration, wss) => {
@@ -37,13 +38,13 @@ module.exports = {
       sendWSMessage(wss, listItem);
 
       // save expo avg data to db
-      // saveExpoAvgData(
-      //   listItem,
-      //   "60",
-      //   intervalDuration,
-      //   product.NIFTY,
-      //   chart.STANDARD
-      // );
+      saveExpoAvgData(
+        listItem,
+        "60",
+        intervalDuration,
+        product.NIFTY,
+        chart.STANDARD
+      );
 
       const indexItems = [...indexListNifty];
       const indexItem = indexItems.pop();
@@ -52,6 +53,7 @@ module.exports = {
         dataType: "IndexData",
         indexData: indexItem,
       };
+      // saveSnapshot(iListItem, "60", product.NIFTY)
       sendWSMessage(wss, iListItem);
     } else if (optionVolListNifty.length > intervalDuration) {
       const tempVolListNifty = [...optionVolListNifty];
@@ -72,13 +74,13 @@ module.exports = {
       pushExpoItem(listItem, intervalDuration, product.NIFTY);
       socketFlag.isExpoFinalDataNifty = true;
       // save expo avg data to db
-      // saveExpoAvgData(
-      //   listItem,
-      //   "60",
-      //   intervalDuration,
-      //   product.NIFTY,
-      //   chart.STANDARD
-      // );
+      saveExpoAvgData(
+        listItem,
+        "60",
+        intervalDuration,
+        product.NIFTY,
+        chart.STANDARD
+      );
       sendWSMessage(wss, listItem);
 
       const indexItems = [...indexListNifty];
@@ -88,6 +90,8 @@ module.exports = {
         dataType: "IndexData",
         indexData: indexItem,
       };
+      // saveSnapshot(iListItem, "60", product.NIFTY)
+
       sendWSMessage(wss, iListItem);
     }
   },
@@ -105,13 +109,13 @@ module.exports = {
       pushExpoItem(listItem, intervalDuration, product.BANKNIFTY);
       socketFlag.isExpoFinalDataBankNifty = true;
       // save expo avg data to db
-      // saveExpoAvgData(
-      //   listItem,
-      //   "60",
-      //   intervalDuration,
-      //   product.BANKNIFTY,
-      //   chart.STANDARD
-      // );
+      saveExpoAvgData(
+        listItem,
+        "60",
+        intervalDuration,
+        product.BANKNIFTY,
+        chart.STANDARD
+      );
       sendWSMessage(wss, listItem);
 
       const indexItems = [...indexListBankNifty];
@@ -121,6 +125,7 @@ module.exports = {
         dataType: "IndexData",
         indexData: indexItem,
       };
+      // saveSnapshot(iListItem, "60", product.BANKNIFTY)
       sendWSMessage(wss, iListItem);
     } else if (optionVolListBankNifty.length > intervalDuration) {
       const tempVolListBankNifty = [...optionVolListBankNifty];
@@ -141,13 +146,13 @@ module.exports = {
       pushExpoItem(listItem, intervalDuration, product.BANKNIFTY);
       socketFlag.isExpoFinalDataBankNifty = true;
       // save expo avg data to db
-      // saveExpoAvgData(
-      //   listItem,
-      //   "60",
-      //   intervalDuration,
-      //   product.BANKNIFTY,
-      //   chart.STANDARD
-      // );
+      saveExpoAvgData(
+        listItem,
+        "60",
+        intervalDuration,
+        product.BANKNIFTY,
+        chart.STANDARD
+      );
       sendWSMessage(wss, listItem);
 
       const indexItems = [...indexListBankNifty];
@@ -157,6 +162,7 @@ module.exports = {
         dataType: "IndexData",
         indexData: indexItem,
       };
+      // saveSnapshot(iListItem, "60", product.BANKNIFTY)
       sendWSMessage(wss, iListItem);
     }
   },
