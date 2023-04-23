@@ -32,51 +32,51 @@ module.exports = {
     const month = moment().month();
     const date = moment().date();
     const year = moment().year();
-    let fromTime = moment([year, month, 03, 9, 15, 00, 00]).unix();
+    let fromTime = moment([year, month, 20, 9, 15, 00, 00]).unix();
 
     // create 2 pipeline for NIFTY(PE/CE) & BANKNIFTY(PE/CE)
     generatePipeline(conn, wss, product.NIFTY);
     generatePipeline(conn, wss, product.BANKNIFTY);
 
-    SubscribeSnapshot(conn, instrumentId1, false);
-    SubscribeSnapshot(conn, instrumentId2, false);
+    // SubscribeSnapshot(conn, instrumentId1, false);
+    // SubscribeSnapshot(conn, instrumentId2, false);
 
-    // console.log("Minute Call, ", moment(fromTime).toDate());
-    // setTimeout(() => {
-    //   GetFutureHistory(
-    //     conn,
-    //     instrumentId1,
-    //     fromTime,
-    //     fromTime,
-    //     "FutureHistory"
-    //   );
-    //   GetFutureHistory(
-    //     conn,
-    //     instrumentId2,
-    //     fromTime,
-    //     fromTime,
-    //     "FutureHistory"
-    //   );
+    console.log("Minute Call, ", moment(fromTime).toDate());
+    setTimeout(() => {
+      GetFutureHistory(
+        conn,
+        instrumentId1,
+        fromTime,
+        fromTime,
+        "FutureHistory"
+      );
+      GetFutureHistory(
+        conn,
+        instrumentId2,
+        fromTime,
+        fromTime,
+        "FutureHistory"
+      );
 
-    //   socketInterval.minuteInterval = setInterval(() => {
-    //     fromTime = fromTime + 60;
-    //     console.log("Minute Call, ", moment(fromTime).toDate());
-    //     GetFutureHistory(
-    //       conn,
-    //       instrumentId1,
-    //       fromTime,
-    //       fromTime,
-    //       "FutureHistory"
-    //     );
-    //     GetFutureHistory(
-    //       conn,
-    //       instrumentId2,
-    //       fromTime,
-    //       fromTime,
-    //       "FutureHistory"
-    //     );
-    //   }, 5000); // wait for 60 sec
-    // }, 2000); // wait until pipeline generated
+      socketInterval.minuteInterval = setInterval(() => {
+        fromTime = fromTime + 60;
+        console.log("Minute Call, ", moment(fromTime).toDate());
+        GetFutureHistory(
+          conn,
+          instrumentId1,
+          fromTime,
+          fromTime,
+          "FutureHistory"
+        );
+        GetFutureHistory(
+          conn,
+          instrumentId2,
+          fromTime,
+          fromTime,
+          "FutureHistory"
+        );
+      }, 5000); // wait for 60 sec
+    }, 2000); // wait until pipeline generated
   },
 
   tickReqController: (conn, wss) => {

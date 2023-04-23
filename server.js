@@ -38,7 +38,7 @@ app.get("/status", (req, res, next) => {
 })
 
 app.get("/indexData", async (req, res) => {
-  const { exchange, interval, timestamp } = req.body;
+  const { exchange, interval, timestamp } = req.query;
   const result = await fetchSnapshots(exchange, interval, timestamp)
   if(!result) {
     return res.status(400).json({
@@ -51,7 +51,7 @@ app.get("/indexData", async (req, res) => {
 })
 
 app.get("/expoData", async (req, res) => {
-  const { exchange, interval, duration, timestamp } = req.body;
+  const { exchange, interval, duration, timestamp } = req.query;
   const result = await fetchExpoAvgData(exchange, interval, duration, timestamp)
   if(!result) {
     return res.status(400).json({

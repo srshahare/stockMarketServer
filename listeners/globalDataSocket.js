@@ -810,6 +810,6 @@ module.exports = {
       sendWSMessage(wsClient, msg5);
       client.connect(endpoint);
     });
-    client.connect(endpoint);
+    // client.connect(endpoint);
   },
 };
