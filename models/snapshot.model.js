@@ -6,7 +6,7 @@ module.exports = (sequelize, Sequelize) => {
             primaryKey: true
         },
         timeStamp: {
-            type: Sequelize.STRING,
+            type: Sequelize.BIGINT,
             required: true
         },
         exchangeName: {

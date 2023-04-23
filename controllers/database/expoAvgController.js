@@ -14,12 +14,12 @@ module.exports = {
     chartType
   ) => {
     try {
-      const timestamp = String(expoItem.tradeTime);
+      const timestamp = parseInt(expoItem.tradeTime);
       const expoAvgData = JSON.stringify(expoItem);
       const data = {
         timeStamp: timestamp,
         exchangeName: exchange,
-        futureIndex: exchange === product.NIFTY ? "NIFTY 50": "BANK NIFTY",
+        futureIndex: exchange === product.NIFTY ? "NIFTY 50" : "BANK NIFTY",
         interval,
         duration: String(duration),
         chartType,
@@ -55,43 +55,46 @@ module.exports = {
           order: [["timeStamp", "DESC"]],
           limit: 800,
         });
-        if(expoAvgData) {
-            resolve(expoAvgData)
-        }else {
-            reject({
-                status: 402,
-                message: "Error in fetching the data"
-            })
+        if (expoAvgData) {
+          resolve(expoAvgData);
+        } else {
+          reject({
+            status: 402,
+            message: "Error in fetching the data",
+          });
         }
       } catch (err) {
         reject({
-            status: 500,
-            message: err.message
-        })
+          status: 500,
+          message: err.message,
+        });
         console.log(err);
       }
     });
   },
 
-  fetchExpoAvgData: (exchange, interval, duration, uptoDate) => {
+  fetchExpoAvgData: (exchange, interval, duration, timestamp) => {
     return new Promise(async (resolve, reject) => {
       try {
         let limit = 360;
-        if(duration === "15") {
-          limit = 360
-        }else if (duration === "30") {
-          limit = 345
-        }else if (duration === "45") {
-          limit = 330
-        }else {
-          limit = 315
+        if (duration === "15") {
+          limit = 360;
+        } else if (duration === "30") {
+          limit = 345;
+        } else if (duration === "45") {
+          limit = 330;
+        } else {
+          limit = 315;
         }
+        const fromTime = timestamp;
+        const toTime = timestamp + 22500;
         const expoAvgData = await ExpoAvg.findAll({
           where: {
             [Op.and]: [
               {
-                createdAt: {
-                  [Op.gte]: uptoDate.toDate(),
+                timeStamp: {
+                  [Op.gte]: fromTime,
+                  [Op.lte]: toTime,
                 },
               },
               { exchangeName: exchange },
@@ -99,22 +102,22 @@ module.exports = {
               { duration: duration },
             ],
           },
-          order: [["timeStamp", "DESC"]],
+          order: [["timeStamp", "ASC"]],
           limit: limit,
         });
-        if(expoAvgData) {
-            resolve(expoAvgData)
-        }else {
-            reject({
-                status: 402,
-                message: "Error in fetching the data"
-            })
+        if (expoAvgData) {
+          resolve(expoAvgData);
+        } else {
+          reject({
+            status: 402,
+            message: "Error in fetching the data",
+          });
         }
       } catch (err) {
         reject({
-            status: 500,
-            message: err.message
-        })
+          status: 500,
+          message: err.message,
+        });
         console.log(err);
       }
     });

@@ -634,7 +634,7 @@ module.exports = {
                 // for tick data
                 socketTickFlag.isNewTickNiftySnapshot = true;
                 socketTickFlag.isExpoTickFinalData = false;
-                saveSnapshot(item, tickInterval, product.NIFTY);
+                // saveSnapshot(item, tickInterval, product.NIFTY);
               } else {
                 if (Result.length > 0) {
                   dataListBankNifty.push(item);
@@ -654,7 +654,7 @@ module.exports = {
                 // for tick data
                 socketTickFlag.isNewTickBankNiftySnapshot = true;
                 socketTickFlag.isExpoTickFinalDataBankNifty = false;
-                saveSnapshot(item, tickInterval, product.BANKNIFTY);
+                // saveSnapshot(item, tickInterval, product.BANKNIFTY);
               }
             } else {
               const userTag = String(Request.UserTag).split("_");

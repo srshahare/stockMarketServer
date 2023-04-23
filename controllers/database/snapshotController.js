@@ -7,7 +7,9 @@ const Snapshot = db.snapshot;
 module.exports = {
   saveSnapshot: async (snapItem, interval, exchange) => {
     try {
-      const timestamp = String(snapItem.LastTradeTime);
+      const timestamp = parseInt(snapItem.tradeTime);
+      console.log("htllo", timestamp)
+
       const snapshotData = JSON.stringify(snapItem);
       const data = {
         timeStamp: timestamp,
@@ -23,22 +25,27 @@ module.exports = {
     }
   },
 
-  fetchSnapshots: (exchange, interval, uptoDate) => {
+  fetchSnapshots: (exchange, interval, timestamp) => {
     return new Promise(async (resolve, reject) => {
       try {
+
+        const fromTime = timestamp;
+        const toTime = timestamp + 22500;
+
         const snapshotData = await Snapshot.findAll({
           where: {
             [Op.and]: [
               {
-                createdAt: {
-                  [Op.gte]: uptoDate.toDate(),
+                timeStamp: {
+                  [Op.gte]: fromTime,
+                  [Op.lte]: toTime
                 },
               },
               { exchangeName: exchange },
               { interval: interval },
             ],
           },
-          order: [["timeStamp", "DESC"]],
+          order: [["timeStamp", "ASC"]],
           limit: 375,
         });
         if (snapshotData) {

@@ -2,6 +2,8 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const http = require("http");
+const { fetchSnapshots } = require("./controllers/database/snapshotController")
+const { fetchExpoAvgData } = require("./controllers/database/expoAvgController");
 
 //Todo Importing database
 const db = require("./models");
@@ -32,6 +34,32 @@ app.get("/status", (req, res, next) => {
   res.status(200).json({
     status: "Ok",
     message: "Server is Running"
+  })
+})
+
+app.get("/indexData", async (req, res) => {
+  const { exchange, interval, timestamp } = req.body;
+  const result = await fetchSnapshots(exchange, interval, timestamp)
+  if(!result) {
+    return res.status(400).json({
+      message: "Error fetching data"
+    })
+  }
+  res.status(200).json({
+    data: result
+  })
+})
+
+app.get("/expoData", async (req, res) => {
+  const { exchange, interval, duration, timestamp } = req.body;
+  const result = await fetchExpoAvgData(exchange, interval, duration, timestamp)
+  if(!result) {
+    return res.status(400).json({
+      message: "Error fetching data"
+    })
+  }
+  res.status(200).json({
+    data: result
   })
 })
 
