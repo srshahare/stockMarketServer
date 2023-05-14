@@ -35,12 +35,6 @@ module.exports = {
         const snapshotData = await Snapshot.findAll({
           where: {
             [Op.and]: [
-              {
-                timeStamp: {
-                  [Op.gte]: fromTime,
-                  [Op.lte]: toTime
-                },
-              },
               { exchangeName: exchange },
               { interval: interval },
             ],
