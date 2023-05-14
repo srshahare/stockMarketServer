@@ -73,7 +73,7 @@ module.exports = {
     });
   },
 
-  fetchExpoAvgData: (exchange, interval, duration, timestamp) => {
+  fetchExpoAvgData: (exchange, interval, duration, fromTime, toTime) => {
     return new Promise(async (resolve, reject) => {
       try {
         let limit = 360;
@@ -86,8 +86,6 @@ module.exports = {
         } else {
           limit = 315;
         }
-        const fromTime = timestamp;
-        const toTime = timestamp + 22500;
         const expoAvgData = await ExpoAvg.findAll({
           where: {
             [Op.and]: [

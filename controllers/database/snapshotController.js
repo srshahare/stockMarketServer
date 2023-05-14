@@ -25,17 +25,19 @@ module.exports = {
     }
   },
 
-  fetchSnapshots: (exchange, interval, timestamp) => {
+  fetchSnapshots: (exchange, interval, fromTime, toTime) => {
     return new Promise(async (resolve, reject) => {
       try {
-
-        const fromTime = timestamp;
-        const toTime = timestamp + 22500;
 
         const snapshotData = await Snapshot.findAll({
           where: {
             [Op.and]: [
-
+              {
+                timeStamp: {
+                  [Op.gte]: fromTime,
+                  [Op.lte]: toTime
+                },
+              },
               { exchangeName: exchange },
               { interval: interval },
             ],

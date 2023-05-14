@@ -38,8 +38,8 @@ app.get("/status", (req, res, next) => {
 })
 
 app.get("/indexData", async (req, res) => {
-  const { exchange, interval, timestamp } = req.query;
-  const result = await fetchSnapshots(exchange, interval, timestamp)
+  const { exchange, interval, fromTime, toTime } = req.query;
+  const result = await fetchSnapshots(exchange, interval, fromTime, toTime)
   if(!result) {
     return res.status(400).json({
       message: "Error fetching data"
@@ -51,8 +51,8 @@ app.get("/indexData", async (req, res) => {
 })
 
 app.get("/expoData", async (req, res) => {
-  const { exchange, interval, duration, timestamp } = req.query;
-  const result = await fetchExpoAvgData(exchange, interval, duration, timestamp)
+  const { exchange, interval, duration, fromTime, toTime } = req.query;
+  const result = await fetchExpoAvgData(exchange, interval, duration, fromTime, toTime)
   if(!result) {
     return res.status(400).json({
       message: "Error fetching data"
